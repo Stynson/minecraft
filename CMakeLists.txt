@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(NotMineCraft VERSION 0.1.0 LANGUAGES CXX)
+project(NotMineCraft VERSION 0.1.0 LANGUAGES CXX) 
 
 option(BUILD_TESTS "Build tests." ON)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -pthread)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
 
