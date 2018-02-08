@@ -9,31 +9,9 @@ include_directories(${INCLUDES})
 
 add_executable(NotMineCraft ${SOURCES})
 
-
-# Bgfx
-#[[
-include_directories(${BX_DIR}/include)
-include_directories(${BIMG_DIR}/include)
-include_directories(${BGFX_DIR}/include)
-include_directories(${BGFX_DIR}/3rdparty)
-include_directories(${BX_DIR}/include/compat/msvc)
-
-FILE(GLOB_RECURSE BGFX_3RDPARTY_SOURCES "${BGFX_DIR}/3rdparty/**/*.cpp")
-HEADER_DIRECTORIES(BGFX_3RDPARTY_INCLUDES "${BGFX_DIR}")
-message(${BGFX_3RDPARTY_INCLUDES})
-set(BGFX_3RDPARTY_INCLUDES ${BGFX_3RDPARTY_INCLUDES} "${BGFX_DIR}/3rdparty/glsl-optimizer/src" "${BGFX_DIR}/3rdparty/glsl-optimizer/src/mesa")
-add_library(bgfx_3rdparty ${BGFX_3RDPARTY_SOURCES})
-include_directories(${BGFX_3RDPARTY_INCLUDES})
-
-target_link_libraries(NotMineCraft bgfx bgfx_3rdparty)
-]]
-
-# Example
-include_directories(${CMAKE_CURRENT_LIST_DIR}/examples/common)
-FILE(GLOB_RECURSE EXAMPLES_SOURCES "${CMAKE_CURRENT_LIST_DIR}/examples/common/*.cpp")
-add_library(examples_sources ${EXAMPLES_SOURCES})
-
-target_link_libraries(NotMineCraft examples_sources)
+# bgfx + link
+include_directories(${BGFX_INCLUDES})
+target_link_libraries(NotMineCraft ${OpenGL_LIBRARIES} bgfx bgfx-common bx bimg Psapi)
 
 # Subprojects
 

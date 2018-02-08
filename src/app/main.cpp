@@ -3,6 +3,8 @@
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
+#define ENTRY_CONFIG_IMPLEMENT_MAIN 1
+
 #include "bgfx_utils.h"
 #include "common.h"
 #include "imgui/imgui.h"
