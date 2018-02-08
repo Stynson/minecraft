@@ -1,3 +1,12 @@
 [submodule "lib/googletest"]
 	path = lib/googletest
 	url = https://github.com/snorrwe/googletest.git
+[submodule "lib/bgfx"]
+	path = lib/bgfx
+	url = https://github.com/snorrwe/bgfx.git
+[submodule "lib/bimg"]
+	path = lib/bimg
+	url = https://github.com/snorrwe/bimg.git
+[submodule "lib/bx"]
+	path = lib/bx
+	url = https://github.com/snorrwe/bx.git
