@@ -1,6 +1,3 @@
 [submodule "lib/googletest"]
 	path = lib/googletest
 	url = https://github.com/snorrwe/googletest.git
-[submodule "lib/bgfx.cmake"]
-	path = lib/bgfx.cmake
-	url = https://github.com/snorrwe/bgfx.cmake.git
