@@ -9,9 +9,13 @@ include_directories(${INCLUDES})
 
 add_executable(NotMineCraft ${SOURCES})
 
-# Subprojects
-set(DEPENDENCY_LIST core)
+# bgfx + link
+include_directories(${BGFX_INCLUDES})
+target_link_libraries(NotMineCraft ${OpenGL_LIBRARIES} bgfx bgfx-common bx bimg Psapi)
 
+# Subprojects
+
+set(DEPENDENCY_LIST core)
 FOREACH(item ${DEPENDENCY_LIST})
 	include_directories(${${item}_INCLUDES})
     target_link_libraries(NotMineCraft ${item})
