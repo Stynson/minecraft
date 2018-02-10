@@ -3,8 +3,7 @@
 #    message(FATAL_ERROR  "BGFX_ROOT_DIR must be defined")
 #endif()
 
-set(_includes 
-    "${BGFX_ROOT_DIR}/bx/include/compat/msvc"  # TODO: platforms
+set(_includes     
     "${BGFX_ROOT_DIR}/bx/include"
     "${BGFX_ROOT_DIR}/bx/3rdparty"
     "${BGFX_ROOT_DIR}/bimg/include"
@@ -16,6 +15,16 @@ set(_includes
     "${BGFX_ROOT_DIR}/bgfx/3rdparty/dxsdk/include"
     "${BGFX_ROOT_DIR}/bgfx/3rdparty"
 )
+
+if(MINGW)
+    set(COMPAT_INCLUDE mingw)
+elseif(MSVC)
+    set(COMPAT_INCLUDE msvc)
+endif()
+
+if(COMPAT_INCLUDE)
+    set(_includes ${_includes} "${BGFX_ROOT_DIR}/bx/include/compat/${COMPAT_INCLUDE}")
+endif()
 
 set(BGFX_SOURCES ${BGFX_ROOT_DIR}/bgfx/src/amalgamated.cpp)
 set(BX_SOURCES ${BGFX_ROOT_DIR}/bx/src/amalgamated.cpp)

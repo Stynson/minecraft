@@ -37,3 +37,4 @@ build
 CMakeSettings.json
 bin
 /.vs
+/CMakeFiles/3.9.6/CompilerIdCXX/Debug/CompilerIdCXX.tlog

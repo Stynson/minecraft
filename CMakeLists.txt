@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.2)
 project(NotMineCraft VERSION 0.1.0 LANGUAGES CXX)
  
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -pthread)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")#[[-pthread]]
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/")
 set(BGFX_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/lib")
 find_package(BGFX REQUIRED) 
 include_directories(${BGFX_INCLUDES})
-find_package(OpenGL REQUIRED)
+find_package(X11 REQUIRED)
 
 option(BUILD_TESTS "Build tests." ON)
 

@@ -11,7 +11,7 @@ add_executable(NotMineCraft ${SOURCES})
 
 # bgfx + link
 include_directories(${BGFX_INCLUDES})
-target_link_libraries(NotMineCraft ${OpenGL_LIBRARIES} bgfx bgfx-common bx bimg Psapi)
+target_link_libraries(NotMineCraft ${X11_LIBRARIES} bgfx bgfx-common bx bimg Psapi)
 
 # Subprojects
 
