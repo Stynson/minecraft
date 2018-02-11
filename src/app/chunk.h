@@ -23,15 +23,17 @@ namespace mc {
 	class Chunk {
 	public:
 		static const uint8_t WIDTH = 16;
-		static const uint8_t HEIGHT_MINUS_ONE = 255;
+		static const uint16_t HEIGHT = 255;
+
+		Chunk() : mX(0), mY(0) {};
 
 		Chunk(int x, int y) : mX(x), mY(y) {};
 
-		Block getBlock(uint8_t x, uint8_t y, uint8_t z);
+		Block getBlock(uint8_t x, uint8_t y, uint8_t z) const;
 		void setBlock(Block type, uint8_t x, uint8_t y, uint8_t z);
 
 	private:
-		std::array<Block, WIDTH * WIDTH * HEIGHT_MINUS_ONE> mData;
+		std::array<Block, WIDTH * WIDTH * HEIGHT> mData;
 		int mX;
 		int mY;
 

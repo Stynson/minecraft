@@ -45,6 +45,7 @@ endif()
 
 set( APP_RUNTIME_DIR "${APP_DIR}/runtime" CACHE STRING "Location of runtime files." )
 set( APP_COMMON_DIR "${APP_DIR}/common" CACHE STRING "Location of common files." )
+set( GLM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm" CACHE STRING "Location of glm library." )
 
 if( BGFX_USE_OVR )
 	include( cmake/ovr.cmake )
@@ -58,6 +59,8 @@ include( cmake/bgfx.cmake )
 if( BGFX_BUILD_TOOLS )
 	include( cmake/tools.cmake )
 endif()
+
+include( cmake/glm.cmake )
 
 #include( cmake/examples.cmake )
 include( cmake/minecraft.cmake )
