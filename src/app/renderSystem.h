@@ -1,5 +1,6 @@
 #pragma once
 #include "chunk.h"
+#include "cullingSystem.h"
 
 class RenderSystem
 {
@@ -258,7 +259,6 @@ namespace mc
 			const double freq = double(bx::getHPFrequency());
 			const float deltaTime = float(frameTime / freq);
 
-			//showExampleDialog(this);
 
 			imguiEndFrame();
 
@@ -337,10 +337,11 @@ namespace mc
 				bgfx::setViewRect(0, 0, 0, uint16_t(mWidth), uint16_t(mHeight));
 
 				cameraGetViewMtx(m_viewMtx);
-				bx::mtxProj(m_projMtx, 60.0f, float(mWidth) / float(mHeight), 0.1f, 2000.0f, bgfx::getCaps()->homogeneousDepth);
-				bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
 
-				renderChunk(Chunk{});
+				for (auto& chunk : cullingSystem.getCulledChunks(0,0,1.0,5))
+				{
+					renderChunk(chunk);
+				}
 			} 
 
 			// Advance to next frame. Rendering thread will be kicked to
@@ -350,6 +351,8 @@ namespace mc
 		}
 		void renderChunk(const Chunk& chunk)
 		{
+			bx::mtxProj(m_projMtx, 60.0f, float(mWidth) / float(mHeight), 0.1f, 2000.0f, bgfx::getCaps()->homogeneousDepth);
+			bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
 			//TODO
 			float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
@@ -380,9 +383,9 @@ namespace mc
 								mtx[14] = float(z)*2.0f;
 
 								float* color = (float*)&data[64];
-								color[0] = bx::sin(time + float(x) / 11.0f)*0.5f + 0.5f;
-								color[1] = bx::cos(time + float(y) / 11.0f)*0.5f + 0.5f;
-								color[2] = bx::sin(time*3.0f)*0.5f + 0.5f;
+								color[0] = 0.0f;// bx::sin(time + float(x) / 11.0f)*0.5f + 0.5f;
+								color[1] = 1.0f;// bx::cos(time + float(y) / 11.0f)*0.5f + 0.5f;
+								color[2] = 0.0f;//bx::sin(time*3.0f)*0.5f + 0.5f;
 								color[3] = 1.0f;
 
 								data += instanceStride;
@@ -407,6 +410,7 @@ namespace mc
 			}
 		}
 	private:
+		CullingSystem cullingSystem = (CellSystem{ MapGenerator{0} });
 		bgfx::TextureHandle m_uffizi;
 		bgfx::UniformHandle s_texCube;
 		bgfx::UniformHandle u_mtx;
@@ -462,6 +466,7 @@ namespace mc
 					, uint16_t(m_width)
 					, uint16_t(m_height)
 				);
+				showExampleDialog(this);
 				return mRenderSystem.update(m_width, m_height, m_reset, m_mouseState);
 			}
 			return false;
