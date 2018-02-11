@@ -25,6 +25,8 @@ namespace mc {
 		static const uint8_t WIDTH = 16;
 		static const uint8_t HEIGHT_MINUS_ONE = 255;
 
+		Chunk() : mX(0), mY(0) {};
+
 		Chunk(int x, int y) : mX(x), mY(y) {};
 
 		Block getBlock(uint8_t x, uint8_t y, uint8_t z);

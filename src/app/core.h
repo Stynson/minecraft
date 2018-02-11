@@ -5,6 +5,8 @@
 #include <set>
 #include <string>
 
+#include <glm/vec3.hpp>
+
 namespace core
 {
 	template<typename T>
@@ -14,4 +16,5 @@ namespace core
 	template<typename T>
 	using Set = std::set<T>;
 	using String = std::string;
+
 }
