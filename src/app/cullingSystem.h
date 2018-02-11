@@ -9,7 +9,7 @@ namespace mc {
 	public:
 		CullingSystem(CellSystem cellSystem) : mCellSystem(cellSystem) {}
 
-		core::Vector<Chunk> getCulledChunks(float x, float y, float direction, int distance);
+		core::Vector<Chunk*> getCulledChunks(float x, float y, float direction, int distance);
 
 	private:
 		CellSystem mCellSystem;

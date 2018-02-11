@@ -340,7 +340,7 @@ namespace mc
 
 				for (auto& chunk : cullingSystem.getCulledChunks(0,0,1.0,5))
 				{
-					renderChunk(chunk);
+					renderChunk(*chunk);
 				}
 			} 
 
