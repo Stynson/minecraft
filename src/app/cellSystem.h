@@ -1,7 +1,7 @@
 #pragma once
 
-#include <chunk.h>
-#include <mapGenerator.h>
+#include "chunk.h"
+#include "mapGenerator.h"
 #include <map>
 
 namespace mc {
