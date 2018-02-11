@@ -14,7 +14,10 @@ namespace mc
 			{
 				double n = mPerlinNoise.noise(i, j, -0.2);
 				n = n - floor(n);
-				chunk.setBlock(BlockType::DIRT, i, j, n * 255);
+				for (auto z = 0; z < n*255; z++)
+				{
+					chunk.setBlock(BlockType::DIRT, i, z, j);
+				}
 			}
 		}
 		return chunk;
