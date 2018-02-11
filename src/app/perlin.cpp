@@ -1,4 +1,7 @@
 #include "perlin.h"
+#include <numeric>
+#include <random>
+
 namespace mc
 {
 	PerlinNoise::PerlinNoise()
