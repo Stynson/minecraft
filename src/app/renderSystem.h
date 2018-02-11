@@ -340,58 +340,8 @@ namespace mc
 				bx::mtxProj(m_projMtx, 60.0f, float(mWidth) / float(mHeight), 0.1f, 2000.0f, bgfx::getCaps()->homogeneousDepth);
 				bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
 
-
-
-
-				// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
-				const uint16_t instanceStride = 80;
-				const uint32_t numInstances = 16 * 16 * 256;
-
-				if (numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
-				{
-					bgfx::InstanceDataBuffer idb;
-					bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
-
-					uint8_t* data = idb.data;
-
-					for (uint32_t yy = 0; yy < 60; ++yy)
-					{
-						for (uint32_t z = 0; z < 16; ++z)
-						{
-							for (uint32_t xx = 0; xx < 16; ++xx)
-							{
-								float* mtx = (float*)data;
-								//bx::mtxRotateXY(mtx, time + xx*0.21f, time + yy*0.37f);
-								bx::mtxRotateXY(mtx, 0, 0);
-								mtx[12] = -15.0f + float(xx)*2.0f;
-								mtx[13] = -15.0f + float(yy)*2.0f;
-								mtx[14] = float(z)*2.0f;
-
-								float* color = (float*)&data[64];
-								color[0] = bx::sin(time + float(xx) / 11.0f)*0.5f + 0.5f;
-								color[1] = bx::cos(time + float(yy) / 11.0f)*0.5f + 0.5f;
-								color[2] = bx::sin(time*3.0f)*0.5f + 0.5f;
-								color[3] = 1.0f;
-
-								data += instanceStride;
-							}
-						}
-					}
-
-					// Set vertex and index buffer.
-					bgfx::setVertexBuffer(0, m_vbh);
-					bgfx::setIndexBuffer(m_ibh);
-
-					// Set instance data buffer.
-					bgfx::setInstanceDataBuffer(&idb);
-
-					// Set render states.
-					bgfx::setState(BGFX_STATE_DEFAULT);
-
-					// Submit primitive for rendering to view 0.
-					bgfx::submit(0, m_program);
-				}
-			}
+				renderChunk(Chunk{});
+			} 
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -400,6 +350,9 @@ namespace mc
 		}
 		void renderChunk(const Chunk& chunk)
 		{
+			//TODO
+			float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
+
 			// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
 			const uint16_t instanceStride = 80;
 			const uint32_t numInstances = 16 * 16 * 256;
@@ -411,26 +364,29 @@ namespace mc
 
 				uint8_t* data = idb.data;
 
-				for (uint32_t yy = 0; yy < 60; ++yy)
+				for (uint32_t y = 0; y < 256; ++y)
 				{
 					for (uint32_t z = 0; z < 16; ++z)
 					{
-						for (uint32_t xx = 0; xx < 16; ++xx)
+						for (uint32_t x = 0; x < 16; ++x)
 						{
-							float* mtx = (float*)data;
-							//bx::mtxRotateXY(mtx, time + xx*0.21f, time + yy*0.37f);
-							bx::mtxRotateXY(mtx, 0, 0);
-							mtx[12] = -15.0f + float(xx)*2.0f;
-							mtx[13] = -15.0f + float(yy)*2.0f;
-							mtx[14] = float(z)*2.0f;
+							if (chunk.getBlock(x, z, y).type == BlockType::DIRT)
+							{
+								float* mtx = (float*)data;
+								//bx::mtxRotateXY(mtx, time + x*0.21f, time + y*0.37f);
+								bx::mtxRotateXY(mtx, 0, 0);
+								mtx[12] = -15.0f + float(x)*2.0f;
+								mtx[13] = -15.0f + float(y)*2.0f;
+								mtx[14] = float(z)*2.0f;
 
-							float* color = (float*)&data[64];
-							color[0] = bx::sin(time + float(xx) / 11.0f)*0.5f + 0.5f;
-							color[1] = bx::cos(time + float(yy) / 11.0f)*0.5f + 0.5f;
-							color[2] = bx::sin(time*3.0f)*0.5f + 0.5f;
-							color[3] = 1.0f;
+								float* color = (float*)&data[64];
+								color[0] = bx::sin(time + float(x) / 11.0f)*0.5f + 0.5f;
+								color[1] = bx::cos(time + float(y) / 11.0f)*0.5f + 0.5f;
+								color[2] = bx::sin(time*3.0f)*0.5f + 0.5f;
+								color[3] = 1.0f;
 
-							data += instanceStride;
+								data += instanceStride;
+							}
 						}
 					}
 				}
@@ -450,73 +406,73 @@ namespace mc
 
 			}
 		}
-		private:
-			bgfx::TextureHandle m_uffizi;
-			bgfx::UniformHandle s_texCube;
-			bgfx::UniformHandle u_mtx;
+	private:
+		bgfx::TextureHandle m_uffizi;
+		bgfx::UniformHandle s_texCube;
+		bgfx::UniformHandle u_mtx;
 
-			bx::RngMwc m_rng;
+		bx::RngMwc m_rng;
 
-			bgfx::FrameBufferHandle m_fbh;
+		bgfx::FrameBufferHandle m_fbh;
 
 
-			uint32_t m_debug;
-			bgfx::VertexBufferHandle m_vbh;
-			bgfx::IndexBufferHandle  m_ibh;
-			bgfx::ProgramHandle m_program;
-			bgfx::ProgramHandle m_skyProgram;
+		uint32_t m_debug;
+		bgfx::VertexBufferHandle m_vbh;
+		bgfx::IndexBufferHandle  m_ibh;
+		bgfx::ProgramHandle m_program;
+		bgfx::ProgramHandle m_skyProgram;
 
-			uint32_t mWidth;
-			uint32_t mHeight;
+		uint32_t mWidth;
+		uint32_t mHeight;
 
-			int64_t m_timeOffset;
+		int64_t m_timeOffset;
 
-			float m_viewMtx[16];
-			float m_projMtx[16];
-		};
+		float m_viewMtx[16];
+		float m_projMtx[16];
+	};
 
-		class ExampleInstancing : public entry::AppI
+	class ExampleInstancing : public entry::AppI
+	{
+	public:
+		ExampleInstancing(const char* _name, const char* _description)
+			: entry::AppI(_name, _description)
 		{
-		public:
-			ExampleInstancing(const char* _name, const char* _description)
-				: entry::AppI(_name, _description)
+		}
+
+		void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
+		{
+			mRenderSystem.init(_argc, _argv, _width, _height, m_reset);
+		}
+
+		int shutdown() override
+		{
+			return mRenderSystem.shutdown();
+		}
+
+		bool update() override
+		{
+			if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState))
 			{
+				imguiBeginFrame(m_mouseState.m_mx
+					, m_mouseState.m_my
+					, (m_mouseState.m_buttons[entry::MouseButton::Left] ? IMGUI_MBUT_LEFT : 0)
+					| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
+					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+					, m_mouseState.m_mz
+					, uint16_t(m_width)
+					, uint16_t(m_height)
+				);
+				return mRenderSystem.update(m_width, m_height, m_reset, m_mouseState);
 			}
+			return false;
+		}
 
-			void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
-			{
-				mRenderSystem.init(_argc, _argv, _width, _height, m_reset);
-			}
+		RenderSystem mRenderSystem;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_debug;
+		uint32_t m_reset;
+		entry::MouseState m_mouseState;
+	};
 
-			int shutdown() override
-			{
-				return mRenderSystem.shutdown();
-			}
-
-			bool update() override
-			{
-				if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState))
-				{
-					imguiBeginFrame(m_mouseState.m_mx
-						, m_mouseState.m_my
-						, (m_mouseState.m_buttons[entry::MouseButton::Left] ? IMGUI_MBUT_LEFT : 0)
-						| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
-						| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-						, m_mouseState.m_mz
-						, uint16_t(m_width)
-						, uint16_t(m_height)
-					);
-					return mRenderSystem.update(m_width, m_height, m_reset, m_mouseState);
-				}
-				return false;
-			}
-
-			RenderSystem mRenderSystem;
-			uint32_t m_width;
-			uint32_t m_height;
-			uint32_t m_debug;
-			uint32_t m_reset;
-			entry::MouseState m_mouseState;
-		};
-
-	} // namespace
+} // namespace
