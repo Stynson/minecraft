@@ -3,6 +3,7 @@
 #include "chunk.h"
 #include "mapGenerator.h"
 #include <map>
+#include "core.h"
 
 namespace mc {
 
@@ -12,7 +13,7 @@ namespace mc {
 		Chunk getChunk(int x, int y);
 
 	private:
-		std::map<std::string, Chunk> mMap;
+		core::Map<core::String, Chunk> mMap;
 		MapGenerator mGenerator;
 
 	};
