@@ -2,6 +2,7 @@
 
 #include "chunk.h"
 #include "perlin.h"
+#include <memory>
 
 namespace mc
 {
@@ -12,7 +13,7 @@ namespace mc
 			: mSeed(seed)
 			, mPerlinNoise(seed)
 		{};
-		Chunk generate(int x, int y);
+		std::unique_ptr<Chunk> generate(int x, int y);
 	private:
 		int mSeed;
 		PerlinNoise mPerlinNoise;

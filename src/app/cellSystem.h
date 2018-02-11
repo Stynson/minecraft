@@ -4,6 +4,7 @@
 #include "mapGenerator.h"
 #include <map>
 #include "core.h"
+#include <memory>
 
 namespace mc {
 
@@ -14,7 +15,7 @@ namespace mc {
 		core::Vector<Chunk*> getNearbyChunks(int x, int y, int distance);
 
 	private:
-		core::Map<core::String, Chunk> mMap;
+		core::Map<core::String, std::unique_ptr<Chunk>> mMap;
 		MapGenerator mGenerator;
 
 	};

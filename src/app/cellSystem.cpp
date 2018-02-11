@@ -5,10 +5,9 @@ namespace mc {
 	Chunk* CellSystem::getChunk(int x, int y) {
 		core::String key = x + "_" + y;
 		if (!mMap.count(key)) {
-			Chunk chunk = mGenerator.generate(x, y);
-			mMap[key] = chunk;
+			mMap[key] = std::move(mGenerator.generate(x, y));
 		}
-		return &mMap[key];
+		return mMap[key].get();
 	}
 
 	core::Vector<Chunk*> CellSystem::getNearbyChunks(int x, int y, int distance)

@@ -338,7 +338,7 @@ namespace mc
 
 				cameraGetViewMtx(m_viewMtx);
 
-				for (auto& chunk : cullingSystem.getCulledChunks(0,0,1.0,5))
+				for (auto& chunk : cullingSystem.getCulledChunks(0, 0, 1.0, 5))
 				{
 					renderChunk(*chunk);
 				}
