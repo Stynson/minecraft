@@ -39,7 +39,7 @@ namespace mc
 		// Duplicate the permutation vector
 		p.insert(p.end(), p.begin(), p.end());
 	}
-	double PerlinNoise::noise(double x, double y, double z)
+	double PerlinNoise::noise(double x, double y, double z) const
 	{
 		// Find the unit cube that contains the point
 		int X = (int)floor(x) & 255;
@@ -68,15 +68,15 @@ namespace mc
 		double res = lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), grad(p[BA], x - 1, y, z)), lerp(u, grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z))), lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1)), lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1))));
 		return (res + 1.0) / 2.0;
 	}
-	double PerlinNoise::fade(double t)
+	double PerlinNoise::fade(double t) const
 	{
 		return t * t * t * (t * (t * 6 - 15) + 10);
 	}
-	double PerlinNoise::lerp(double t, double a, double b)
+	double PerlinNoise::lerp(double t, double a, double b) const
 	{
 		return a + t * (b - a);
 	}
-	double PerlinNoise::grad(int hash, double x, double y, double z)
+	double PerlinNoise::grad(int hash, double x, double y, double z) const
 	{
 		int h = hash & 15;
 		// Convert lower 4 bits of hash into 12 gradient directions

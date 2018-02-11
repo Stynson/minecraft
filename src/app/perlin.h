@@ -13,11 +13,11 @@ namespace mc
 		// Generate a new permutation vector based on the value of seed
 		PerlinNoise(unsigned int seed);
 		// Get a noise value, for 2D images z can have any value
-		double noise(double x, double y, double z);
+		double noise(double x, double y, double z) const;
 	private:
-		double fade(double t);
-		double lerp(double t, double a, double b);
-		double grad(int hash, double x, double y, double z);
+		double fade(double t) const;
+		double lerp(double t, double a, double b) const;
+		double grad(int hash, double x, double y, double z) const;
 
 	};
 }

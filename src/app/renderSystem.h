@@ -338,7 +338,7 @@ namespace mc
 
 				cameraGetViewMtx(m_viewMtx);
 
-				for (auto& chunk : cullingSystem.getCulledChunks(0, 0, 1.0, 5))
+				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 5))
 				{
 					renderChunk(*chunk);
 				}
@@ -410,7 +410,8 @@ namespace mc
 			}
 		}
 	private:
-		CullingSystem cullingSystem = (CellSystem{ MapGenerator{0} });
+		CellSystem mCellSystem = MapGenerator{ 0 };
+		CullingSystem mCullingSystem = mCellSystem;
 		bgfx::TextureHandle m_uffizi;
 		bgfx::UniformHandle s_texCube;
 		bgfx::UniformHandle u_mtx;

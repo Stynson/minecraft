@@ -13,7 +13,7 @@ namespace mc
 			: mSeed(seed)
 			, mPerlinNoise(seed)
 		{};
-		std::unique_ptr<Chunk> generate(int x, int y);
+		std::unique_ptr<Chunk> generate(int x, int y) const;
 	private:
 		int mSeed;
 		PerlinNoise mPerlinNoise;
