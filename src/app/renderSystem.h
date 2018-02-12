@@ -1,6 +1,7 @@
 #pragma once
 #include "chunk.h"
 #include "cullingSystem.h"
+#include "preRenderSystem.h"
 
 class RenderSystem
 {
@@ -336,9 +337,10 @@ namespace mc
 
 				cameraGetViewMtx(m_viewMtx);
 
-				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 2))
+				for (auto& mesh : mPreRenderSystem.getMeshes())
 				{
-					renderChunk(*chunk);
+					//TODO render mesh
+					renderChunk(*(mesh->hack));
 				}
 			}
 
@@ -408,6 +410,7 @@ namespace mc
 	private:
 		CellSystem mCellSystem = MapGenerator{ 0 };
 		CullingSystem mCullingSystem = mCellSystem;
+		PreRenderSystem mPreRenderSystem = mCullingSystem;
 		//bgfx::TextureHandle m_uffizi;
 		//bgfx::UniformHandle s_texCube;
 		bgfx::UniformHandle u_mtx;
