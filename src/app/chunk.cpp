@@ -1,14 +1,21 @@
 #include "chunk.h"
 
-namespace mc {
+namespace mc
+{
 
-	Block Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) const {
-		return mData[(y * WIDTH * WIDTH) + (z * WIDTH) + x];
+    size_t Chunk::idAt(uint8_t x, uint8_t y, uint8_t z) const
+    {
+        return (y * WIDTH * WIDTH) + (z * WIDTH) + x;
+    }
+
+	Block Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) const
+    {
+		return mData[idAt(x,y,z)];
 	}
 
-	void Chunk::setBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z) {
-		int id = (y * WIDTH * WIDTH) + (z * WIDTH) + x;
-		mData[id].type = type;
+	void Chunk::setBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z)
+    {
+		mData[idAt(x,y,z)].type = type;
 	}
 
 }
