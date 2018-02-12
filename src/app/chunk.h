@@ -23,7 +23,7 @@ namespace mc {
 	class Chunk {
 	public:
 		static const uint8_t WIDTH = 16;
-		static const uint16_t HEIGHT = 255;
+		static const uint16_t HEIGHT = 16;
 
 		Chunk() : mX(0), mY(0) {};
 
