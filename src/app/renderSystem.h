@@ -227,7 +227,7 @@ namespace mc
 
 			cameraCreate();
 
-			const float initialPos[3] = { 0, 0, -20.0f };
+			const float initialPos[3] = { 0, 20, -40.0f };
 			cameraSetPosition(initialPos);
 			cameraSetVerticalAngle(0);// -bx::kPi / 4.0f);
 
@@ -336,9 +336,7 @@ namespace mc
 
 				cameraGetViewMtx(m_viewMtx);
 
-				// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
-
-				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 1))
+				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 5))
 				{
 					renderChunk(*chunk);
 				}
@@ -356,6 +354,7 @@ namespace mc
 			//TODO use C++
 			float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
+			// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
 			const uint16_t instanceStride = 80;
 			const uint32_t numInstances = 16 * 16 * 16;
 			if (numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))

@@ -11,7 +11,7 @@ namespace mc
 		{
 			for (auto j = 0; j < Chunk::WIDTH; j++)
 			{
-				double n = mPerlinNoise.noise(i, j, -0.2);
+				double n = mPerlinNoise.noise(chunk->getX() + i, chunk->getY() + j, -0.2);
 				n -= floor(n);
 				n *= Chunk::HEIGHT;
 				for (auto z = 0; z < n; z++)
