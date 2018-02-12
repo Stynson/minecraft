@@ -336,7 +336,7 @@ namespace mc
 
 				cameraGetViewMtx(m_viewMtx);
 
-				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 5))
+				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 2))
 				{
 					renderChunk(*chunk);
 				}
@@ -376,7 +376,7 @@ namespace mc
 								bx::mtxRotateXY(mtx, 0, 0);
 								mtx[12] = float(x)*2.0f + (16 * chunk.getX() * 2.0f);
 								mtx[13] = float(y)*2.0f;
-								mtx[14] = float(z)*2.0f + (16 * chunk.getY() * 2.0f);
+								mtx[14] = float(z)*2.0f + (16 * chunk.getZ() * 2.0f);
 
 								float* color = (float*)&data[64];
 								color[0] = 0.0f;// bx::sin(time + float(x) / 11.0f)*0.5f + 0.5f;

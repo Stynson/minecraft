@@ -14,8 +14,8 @@ namespace mc {
 			: mGenerator(generator)
 		{
 		};
-		Chunk* getChunk(int x, int y) ;
-		core::Vector<Chunk*> getNearbyChunks(int x, int y, int distance) ;
+		Chunk* getChunk(int x, int z) ;
+		core::Vector<Chunk*> getNearbyChunks(int x, int z, int distance) ;
 
 	private:
 		core::Map<core::String, std::unique_ptr<Chunk>> mMap;
