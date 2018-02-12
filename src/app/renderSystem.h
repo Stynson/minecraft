@@ -190,14 +190,14 @@ namespace mc
 				, 0
 			);
 
-			m_uffizi = loadTexture("textures/uffizi.dds"
-				, 0
-				| BGFX_TEXTURE_U_CLAMP
-				| BGFX_TEXTURE_V_CLAMP
-				| BGFX_TEXTURE_W_CLAMP
-			);
-			s_texCube = bgfx::createUniform("s_texCube", bgfx::UniformType::Int1);
-			u_mtx = bgfx::createUniform("u_mtx", bgfx::UniformType::Mat4);
+			//m_uffizi = loadTexture("textures/uffizi.dds"
+			//	, 0
+			//	| BGFX_TEXTURE_U_CLAMP
+			//	| BGFX_TEXTURE_V_CLAMP
+			//	| BGFX_TEXTURE_W_CLAMP
+			//);
+		//	s_texCube = bgfx::createUniform("s_texCube", bgfx::UniformType::Int1);
+		//	u_mtx = bgfx::createUniform("u_mtx", bgfx::UniformType::Mat4);
 
 
 
@@ -241,10 +241,10 @@ namespace mc
 			bgfx::destroy(m_ibh);
 			bgfx::destroy(m_vbh);
 			bgfx::destroy(m_program);
-			bgfx::destroy(m_skyProgram);
+			//	bgfx::destroy(m_skyProgram);
 
 
-			// Shutdown bgfx.
+				// Shutdown bgfx.
 			bgfx::shutdown();
 
 			return 0;
@@ -315,17 +315,17 @@ namespace mc
 			float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
 			// Get renderer capabilities info.
-			const bgfx::Caps* caps = bgfx::getCaps();
+			//const bgfx::Caps* caps = bgfx::getCaps();
 
 			// Check if instancing is supported.
-			if (0 == (BGFX_CAPS_INSTANCING & caps->supported))
-			{
-				// When instancing is not supported by GPU, implement alternative
-				// code path that doesn't use instancing.
-				bool blink = uint32_t(time*3.0f) & 1;
-				bgfx::dbgTextPrintf(0, 0, blink ? 0x1f : 0x01, " Instancing is not supported by GPU. ");
-			}
-			else
+			//if (0 == (BGFX_CAPS_INSTANCING & caps->supported))
+			//{
+			//	// When instancing is not supported by GPU, implement alternative
+			//	// code path that doesn't use instancing.
+			//	bool blink = uint32_t(time*3.0f) & 1;
+			//	bgfx::dbgTextPrintf(0, 0, blink ? 0x1f : 0x01, " Instancing is not supported by GPU. ");
+			//}
+			//else
 			{
 
 				if (!ImGui::MouseOverArea())
@@ -333,16 +333,16 @@ namespace mc
 					cameraUpdate(deltaTime, m_mouseState);
 					//if (!!m_mouseState.m_buttons[entry::MouseButton::Left])
 				}
-				//				// Set view 0 default viewport.
-				bgfx::setViewRect(0, 0, 0, uint16_t(mWidth), uint16_t(mHeight));
 
 				cameraGetViewMtx(m_viewMtx);
+
+				// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
 
 				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 5))
 				{
 					renderChunk(*chunk);
 				}
-			} 
+			}
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -353,33 +353,30 @@ namespace mc
 		{
 			bx::mtxProj(m_projMtx, 60.0f, float(mWidth) / float(mHeight), 0.1f, 2000.0f, bgfx::getCaps()->homogeneousDepth);
 			bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
-			//TODO
+			//TODO use C++
 			float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
-			// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
 			const uint16_t instanceStride = 80;
-			const uint32_t numInstances = 16 * 16 * 256;
-
+			const uint32_t numInstances = 16 * 16 * 16;
 			if (numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
 			{
 				bgfx::InstanceDataBuffer idb;
 				bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
-
 				uint8_t* data = idb.data;
 
-				for (uint32_t y = 0; y < 256; ++y)
+				for (uint32_t x = 0; x < 16; ++x)
 				{
-					for (uint32_t z = 0; z < 16; ++z)
+					for (uint32_t y = 0; y < 16; ++y)
 					{
-						for (uint32_t x = 0; x < 16; ++x)
+						for (uint32_t z = 0; z < 16; ++z)
 						{
 							if (chunk.getBlock(x, z, y).type == BlockType::DIRT)
 							{
 								float* mtx = (float*)data;
 								//bx::mtxRotateXY(mtx, time + x*0.21f, time + y*0.37f);
 								bx::mtxRotateXY(mtx, 0, 0);
-								mtx[12] = -15.0f + float(x)*2.0f;
-								mtx[13] = -15.0f + float(y)*2.0f;
+								mtx[12] = float(x)*2.0f;
+								mtx[13] = float(y)*2.0f;
 								mtx[14] = float(z)*2.0f;
 
 								float* color = (float*)&data[64];
@@ -406,14 +403,14 @@ namespace mc
 
 				// Submit primitive for rendering to view 0.
 				bgfx::submit(0, m_program);
-
 			}
+
 		}
 	private:
 		CellSystem mCellSystem = MapGenerator{ 0 };
 		CullingSystem mCullingSystem = mCellSystem;
-		bgfx::TextureHandle m_uffizi;
-		bgfx::UniformHandle s_texCube;
+		//bgfx::TextureHandle m_uffizi;
+		//bgfx::UniformHandle s_texCube;
 		bgfx::UniformHandle u_mtx;
 
 		bx::RngMwc m_rng;

@@ -13,9 +13,10 @@ namespace mc
 			{
 				double n = mPerlinNoise.noise(i, j, -0.2);
 				n = n - floor(n);
-				for (auto z = 0; z < n * 255; z++)
+				for (auto z = 0; z < n * Chunk::HEIGHT; z++)
 				{
 					chunk->setBlock(BlockType::DIRT, i, z, j);
+					std::cout << "alma" << i;
 				}
 			}
 		}
