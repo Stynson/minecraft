@@ -12,11 +12,11 @@ namespace mc
 			for (auto j = 0; j < Chunk::WIDTH; j++)
 			{
 				double n = mPerlinNoise.noise(i, j, -0.2);
-				n = n - floor(n);
-				for (auto z = 0; z < n * Chunk::HEIGHT; z++)
+				n -= floor(n);
+				n *= Chunk::HEIGHT;
+				for (auto z = 0; z < n; z++)
 				{
-					chunk->setBlock(BlockType::DIRT, i, z, j);
-					std::cout << "alma" << i;
+					chunk->setBlockType(BlockType::DIRT, i, z, j);
 				}
 			}
 		}

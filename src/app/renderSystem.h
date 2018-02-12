@@ -338,7 +338,7 @@ namespace mc
 
 				// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
 
-				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 5))
+				for (auto& chunk : mCullingSystem.getCulledChunks(0, 0, 1.0, 1))
 				{
 					renderChunk(*chunk);
 				}
@@ -364,20 +364,20 @@ namespace mc
 				bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
 				uint8_t* data = idb.data;
 
-				for (uint32_t x = 0; x < 16; ++x)
+				for (uint32_t y = 0; y < 16; ++y)
 				{
-					for (uint32_t y = 0; y < 16; ++y)
+					for (uint32_t z = 0; z < 16; ++z)
 					{
-						for (uint32_t z = 0; z < 16; ++z)
+						for (uint32_t x = 0; x < 16; ++x)
 						{
-							if (chunk.getBlock(x, z, y).type == BlockType::DIRT)
+							if (chunk.getBlock(x, y, z).type == BlockType::DIRT)
 							{
 								float* mtx = (float*)data;
-								//bx::mtxRotateXY(mtx, time + x*0.21f, time + y*0.37f);
+								//bx::mtxRotateXY(mtx, time + x * 0.21f, time + y * 0.37f);
 								bx::mtxRotateXY(mtx, 0, 0);
-								mtx[12] = float(x)*2.0f;
+								mtx[12] = float(x)*2.0f + (16 * chunk.getX() * 2.0f);
 								mtx[13] = float(y)*2.0f;
-								mtx[14] = float(z)*2.0f;
+								mtx[14] = float(z)*2.0f + (16 * chunk.getY() * 2.0f);
 
 								float* color = (float*)&data[64];
 								color[0] = 0.0f;// bx::sin(time + float(x) / 11.0f)*0.5f + 0.5f;

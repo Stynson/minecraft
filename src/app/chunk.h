@@ -4,7 +4,7 @@
 namespace mc {
 
 	enum class BlockType :uint8_t {
-		AIR
+		AIR=0
 		, DIRT
 	};
 
@@ -30,7 +30,10 @@ namespace mc {
 		Chunk(int x, int y) : mX(x), mY(y) {};
 
 		Block getBlock(uint8_t x, uint8_t y, uint8_t z) const;
-		void setBlock(Block type, uint8_t x, uint8_t y, uint8_t z);
+		void setBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z);
+
+		int getX() const { return mX; }
+		int getY() const { return mY;	}
 
 	private:
 		std::array<Block, WIDTH * WIDTH * HEIGHT> mData;

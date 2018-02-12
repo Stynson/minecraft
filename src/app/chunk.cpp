@@ -6,8 +6,11 @@ namespace mc {
 		return mData[(y * WIDTH * WIDTH) + (z * WIDTH) + x];
 	}
 
-	void Chunk::setBlock(Block block, uint8_t x, uint8_t y, uint8_t z) {
-		mData[(y * WIDTH * WIDTH) + (z * WIDTH) + x] = block;
+	void Chunk::setBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z) {
+		int id = (y * WIDTH * WIDTH) + (z * WIDTH) + x;
+		//mData[id] = block;
+		//mData[id] = Block(BlockType::DIRT);
+		mData[id].type = type;
 	}
 
 }
