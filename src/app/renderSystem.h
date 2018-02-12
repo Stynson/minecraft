@@ -53,14 +53,14 @@ namespace mc
 
 	static PosColorVertex s_cubeVertices[8] =
 	{
-		{ -1.0f,  1.0f,  1.0f, 0xff000000 },
-	{ 1.0f,  1.0f,  1.0f, 0xff0000ff },
-	{ -1.0f, -1.0f,  1.0f, 0xff00ff00 },
-	{ 1.0f, -1.0f,  1.0f, 0xff00ffff },
-	{ -1.0f,  1.0f, -1.0f, 0xffff0000 },
-	{ 1.0f,  1.0f, -1.0f, 0xffff00ff },
-	{ -1.0f, -1.0f, -1.0f, 0xffffff00 },
-	{ 1.0f, -1.0f, -1.0f, 0xffffffff },
+		{ -1.0f,  1.0f,  1.0f, 0xff000000 }
+		, { 1.0f,  1.0f,  1.0f, 0xff0000ff }
+		, { -1.0f, -1.0f,  1.0f, 0xff00ff00 }
+		, { 1.0f, -1.0f,  1.0f, 0xff00ffff }
+		, { -1.0f,  1.0f, -1.0f, 0xffff0000 }
+		, { 1.0f,  1.0f, -1.0f, 0xffff00ff }
+		, { -1.0f, -1.0f, -1.0f, 0xffffff00 }
+		, { 1.0f, -1.0f, -1.0f, 0xffffffff }
 	};
 
 	static const uint16_t s_cubeIndices[36] =
@@ -241,7 +241,7 @@ namespace mc
 			bgfx::destroy(m_ibh);
 			bgfx::destroy(m_vbh);
 			bgfx::destroy(m_program);
-			bgfx::destroy(m_skyProgram);
+			//bgfx::destroy(m_skyProgram);
 
 
 			// Shutdown bgfx.
@@ -342,7 +342,7 @@ namespace mc
 				{
 					renderChunk(*chunk);
 				}
-			} 
+			}
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
