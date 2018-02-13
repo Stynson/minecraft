@@ -26,9 +26,9 @@ namespace mc
 		PreRenderSystem(CullingSystem& cullingSystem)
 			:mCullingSystem(cullingSystem)
 		{}
-		std::vector<Mesh*> getMeshes()
+		std::vector<Mesh*> getMeshes(float x, float z, float direction, int distance)
 		{
-			auto newChunks = mCullingSystem.getCulledChunks(0, 0, 1.0, 2);
+			auto newChunks = mCullingSystem.getCulledChunks(x, z, direction, distance);
 			auto newMeshes = MeshMap();
 			auto result = core::Vector<Mesh*>();
 			for (auto& chunk : newChunks)
