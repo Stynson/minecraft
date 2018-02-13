@@ -193,7 +193,10 @@ namespace mc
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				auto meshes = mPreRenderSystem.getMeshes(0, 0, 1, 2);
+				float pos[3];
+				cameraGetPosition(pos);
+				auto meshes = mPreRenderSystem.getMeshes(pos[0]/16/2, pos[2]/16/2, 1, 5);
+				//auto meshes = mPreRenderSystem.getMeshes(0, 0, 1, 2);
 
 				for (auto& mesh : meshes)
 				{
@@ -211,7 +214,7 @@ namespace mc
 					// Set render states.
 					bgfx::setState(0
 						| BGFX_STATE_DEFAULT
-						| BGFX_STATE_PT_TRISTRIP
+					//	| BGFX_STATE_PT_TRISTRIP
 					);
 
 					// Submit primitive for rendering to view 0.

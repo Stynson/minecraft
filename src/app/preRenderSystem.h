@@ -67,6 +67,7 @@ namespace mc
 		2, 3, 6, // 10
 		6, 3, 7,
 	};
+
 	static const uint16_t s_cubeTriStrip[] =
 	{
 		0, 1, 2,
@@ -134,7 +135,7 @@ namespace mc
 		bgfx::IndexBufferHandle ibh;
 
 		void addVertices(Side side, int x, int y, int z) {
-			uint8_t vBegin = 3 * (int)side;
+			uint8_t vBegin = 6 * (int)side;
 			for (auto i = vBegin; i < vBegin + 6; i++)
 			{
 				PosColorVertex clone = s_cubeVertices[s_cubeIndices[i]];
@@ -205,32 +206,35 @@ namespace mc
 				for (auto z = 0; z < Chunk::WIDTH; z++)
 				{
 					for (auto x = 0; x < Chunk::WIDTH; x++)
-					{
-						if ( x == 0 || chunk->isBlockType(BlockType::AIR, x-1, y, z))
+					{ 
+						if (!chunk->isBlockType(BlockType::AIR, x, y, z))
 						{
-							m->addVertices(Side::LEFT, x, y, z);
-						}
-						if ( x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
-						{
-							m->addVertices(Side::RIGHT, x, y, z);
-						}
+							if (x == 0 || chunk->isBlockType(BlockType::AIR, x - 1, y, z))
+							{
+								m->addVertices(Side::LEFT, x, y, z);
+							}
+							if (x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
+							{
+								m->addVertices(Side::RIGHT, x, y, z);
+							}
 
-						if ( y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
-						{
-							m->addVertices(Side::UP, x, y, z);
-						}
-						if ( y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
-						{
-							m->addVertices(Side::DOWN, x, y, z);
-						}
+							if (y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
+							{
+								m->addVertices(Side::DOWN, x, y, z);
+							}
+							if (y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
+							{
+								m->addVertices(Side::UP, x, y, z);
+							}
 
-						if ( z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
-						{
-							m->addVertices(Side::FRONT, x, y, z);
-						}
-						if ( z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
-						{
-							m->addVertices(Side::BACK, x, y, z);
+							if (z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
+							{
+								m->addVertices(Side::FRONT, x, y, z);
+							}
+							if (z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
+							{
+								m->addVertices(Side::BACK, x, y, z);
+							}
 						}
 					}
 				}
