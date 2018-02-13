@@ -22,12 +22,11 @@ endif()
 option( BGFX_BUILD_TOOLS      "Build bgfx tools."                             ON  )
 option( BGFX_BUILD_EXAMPLES   "Build bgfx examples."                          ON  )
 option( BGFX_INSTALL          "Create installation target."                   ON  )
-option( BGFX_INSTALL_EXAMPLES "Install examples and their runtimes."          OFF  )
 option( BGFX_CUSTOM_TARGETS   "Include convenience custom targets."           OFF  )
 option( BGFX_USE_OVR          "Build with OVR support."                       OFF )
 option( BGFX_AMALGAMATED      "Amalgamated bgfx build for faster compilation" OFF )
 option( BX_AMALGAMATED        "Amalgamated bx build for faster compilation"   OFF )
-option( BGFX_CONFIG_DEBUG   	  "Enables debug configuration on all builds" OFF)
+option( BGFX_CONFIG_DEBUG     "Enables debug configuration on all builds" OFF)
 
 if( NOT BX_DIR )
 	set( BX_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/bx" CACHE STRING "Location of bx." )
@@ -47,6 +46,14 @@ set( APP_RUNTIME_DIR "${APP_DIR}/runtime" CACHE STRING "Location of runtime file
 set( APP_COMMON_DIR "${APP_DIR}/common" CACHE STRING "Location of common files." )
 set( GLM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm" CACHE STRING "Location of glm library." )
 
+MACRO(COPY_RUNTIME_FILES name)
+      # SDL_Mixer
+      add_custom_command(TARGET ${name} POST_BUILD   
+          COMMAND ${CMAKE_COMMAND} -E copy_directory  
+              "${APP_RUNTIME_DIR}" # <--this is in-file
+              $<TARGET_FILE_DIR:${name}>) # <--this is out-file path
+ENDMACRO()
+
 if( BGFX_USE_OVR )
 	include( cmake/ovr.cmake )
 endif()
@@ -65,6 +72,8 @@ include( cmake/glm.cmake )
 #include( cmake/examples.cmake )
 include( cmake/minecraft.cmake )
 
+#COPY_RUNTIME_FILES( minecraft-app )
+
 if( BGFX_INSTALL )
 	# install bx
 	install( TARGETS bx DESTINATION lib )
@@ -82,13 +91,5 @@ if( BGFX_INSTALL )
 	if( BGFX_BUILD_TOOLS )
         install( TARGETS shaderc DESTINATION bin )
 		install( TARGETS geometryc DESTINATION bin )
-	endif()
-
-	# install examples
-	if( BGFX_BUILD_EXAMPLES AND BGFX_INSTALL_EXAMPLES )
-		install( DIRECTORY ${BGFX_DIR}/examples/runtime/ DESTINATION examples )
-		foreach( EXAMPLE ${BGFX_EXAMPLES} )
-			install( TARGETS example-${EXAMPLE} DESTINATION examples )
-		endforeach()
 	endif()
 endif()
