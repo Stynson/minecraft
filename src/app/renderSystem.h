@@ -335,9 +335,12 @@ namespace mc
 					//if (!!m_mouseState.m_buttons[entry::MouseButton::Left])
 				}
 
+				float pos[3];
+				cameraGetPosition(pos);
 				cameraGetViewMtx(m_viewMtx);
 
-				for (auto& mesh : mPreRenderSystem.getMeshes())
+				for (auto& mesh : mPreRenderSystem.getMeshes(pos[0]/16/2, pos[2]/16/2, 1.0, 2))
+				//for (auto& mesh : mPreRenderSystem.getMeshes(0, 0, 1.0, 2)) 
 				{
 					//TODO render mesh
 					renderChunk(*(mesh->hack));
