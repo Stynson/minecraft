@@ -8,8 +8,95 @@
 #include "cullingSystem.h"
 #include "core.h"
 
+
+#include "common.h"
+#include "bgfx_utils.h"
+#include "imgui/imgui.h"
+#include "camera.h"
+#include "bounds.h"
+
+#include <bx/allocator.h>
+#include <bx/debug.h>
+#include <bx/math.h>
+#include <bx/rng.h>
+
 namespace mc
 {
+	struct PosColorVertex
+	{
+		float m_x;
+		float m_y;
+		float m_z;
+		uint32_t m_abgr;
+
+		static void init()
+		{
+			ms_decl
+				.begin()
+				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+				.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+				.end();
+		};
+
+		static bgfx::VertexDecl ms_decl;
+	};
+	static PosColorVertex s_cubeVertices[8] =
+	{
+		{ -1.0f,  1.0f,  1.0f, 0xff000000 }
+		,{ 1.0f,  1.0f,  1.0f, 0xff0000ff }
+		,{ -1.0f, -1.0f,  1.0f, 0xff00ff00 }
+		,{ 1.0f, -1.0f,  1.0f, 0xff00ffff }
+		,{ -1.0f,  1.0f, -1.0f, 0xffff0000 }
+		,{ 1.0f,  1.0f, -1.0f, 0xffff00ff }
+		,{ -1.0f, -1.0f, -1.0f, 0xffffff00 }
+		,{ 1.0f, -1.0f, -1.0f, 0xffffffff }
+	};
+
+	static const uint16_t s_cubeIndices[36] =
+	{
+		0, 1, 2, // 0
+		1, 3, 2,
+		4, 6, 5, // 2
+		5, 6, 7,
+		0, 2, 4, // 4
+		4, 2, 6,
+		1, 5, 3, // 6
+		5, 7, 3,
+		0, 4, 1, // 8
+		4, 5, 1,
+		2, 3, 6, // 10
+		6, 3, 7,
+	};
+
+	/**
+	*         VERTEX NUMBER/NAMES
+	*
+	*                     0(LUF)         1(RUF)
+	*                       *--------------*
+	*                      /|             /|
+	*   y           4(LUB)/ |      5(RUB)/ |
+	*   |                *--------------*  |
+	*   |                |  |           |  |
+	*   |_____ x         |  |           |  |
+	*   /                |  |2(LLF)     |  |
+	*  /                 |  *-----------|--*3(RLF)
+	*   -z               | /            | /
+	*                    |/             |/
+	*              6(LLB)*--------------*7(RLB)
+	*
+	* */
+
+	enum class Side : uint8_t 
+	{
+		BACK = 0
+		, FRONT
+		, LEFT
+		, RIGHT
+		, UP
+		, DOWN
+	};
+
+
 	struct Mesh
 	{
 		Mesh() = default;
@@ -18,6 +105,48 @@ namespace mc
 		Mesh(Mesh&&) = default;
 		~Mesh() = default;
 		Chunk* hack;
+
+		// --- gabor -------
+		core::Vector<PosColorVertex*> vertices;
+		core::Vector<uint16_t> indices;
+		uint16_t numberOfIndices = 0;
+		std::unique_ptr<bgfx::VertexBufferHandle> vbh;
+		std::unique_ptr<bgfx::IndexBufferHandle> ibh;
+		const bgfx::Memory* vMem;
+		const bgfx::Memory* iMem;
+
+		void addVertices(Side side, int x, int y, int z) {
+			uint8_t vBegin = 4 * (int)side;
+			for (auto i = vBegin; i < vBegin + 6; i++)
+			{
+				PosColorVertex clone = PosColorVertex(s_cubeVertices[i]);
+				clone.m_x += 2 * x;
+				clone.m_y += 2 * y;
+				clone.m_z += 2 * z;
+				vertices.push_back(&clone);
+				indices.push_back(numberOfIndices++);
+			}
+		}
+
+
+		void createHandlers() {
+			size_t numVertices = vertices.size();
+			vMem = bgfx::copy(vertices.data(), numVertices);
+			vbh = std::make_unique<bgfx::VertexBufferHandle>(bgfx::createVertexBuffer(vMem, PosColorVertex::ms_decl));
+			
+			size_t numIndices = indices.size();
+			iMem = bgfx::copy(indices.data(), numIndices);
+			ibh = std::make_unique<bgfx::IndexBufferHandle>(bgfx::createIndexBuffer(iMem));
+		}
+
+		bgfx::VertexBufferHandle* getVertexBufferHandle() const {
+			return vbh.get();
+		}
+		bgfx::IndexBufferHandle* getIndexBufferHandle() const {
+			return ibh.get();
+		}
+
+
 	};
 
 	class PreRenderSystem
@@ -46,16 +175,53 @@ namespace mc
 					newMeshes.insert(std::make_pair(chunk->getKey(), std::make_pair(chunk->getVersion(), std::move(mesh))));
 				}
 			}
-			std::swap(mOldMeshes, newMeshes); 
+			std::swap(mOldMeshes, newMeshes);
 			return result;
 		}
 	private:
 		std::unique_ptr<Mesh> cookMesh(Chunk* chunk)
-		{ 
+		{
 			auto m = std::make_unique<Mesh>();
 			m->hack = chunk;
+			for (auto y = 0; y < Chunk::HEIGHT; y++)
+			{
+				for (auto z = 0; z < Chunk::WIDTH; z++)
+				{
+					for (auto x = 0; x < Chunk::WIDTH; x++)
+					{
+						if (x == 0 || chunk->isBlockType(BlockType::AIR, x-1, y, z))
+						{
+							m->addVertices(Side::LEFT, x, y, z);
+						}
+						if (x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
+						{
+							m->addVertices(Side::RIGHT, x, y, z);
+						}
+
+						if (y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
+						{
+							m->addVertices(Side::UP, x, y, z);
+						}
+						if (y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
+						{
+							m->addVertices(Side::DOWN, x, y, z);
+						}
+
+						if (z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
+						{
+							m->addVertices(Side::FRONT, x, y, z);
+						}
+						if (z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
+						{
+							m->addVertices(Side::BACK, x, y, z);
+						}
+					}
+				}
+			}
+			m->createHandlers();
 			return std::move(m);
 		}
+
 		CullingSystem& mCullingSystem;
 		core::Vector<core::String> mOldChunks;
 		using MeshMap = core::Map<core::String, std::pair<size_t, std::unique_ptr<Mesh>>>;

@@ -54,6 +54,7 @@ namespace mc {
 		}
 		Block getBlock(uint8_t x, uint8_t y, uint8_t z) const;
 		void setBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z);
+		bool isBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z);
 
 		int getX() const { return mX; }
 		int getZ() const { return mZ; }

@@ -32,7 +32,7 @@ namespace mc
 {
 	static float s_texelHalf = 0.0f;
 
-	struct PosColorVertex
+	/*struct PosColorVertex
 	{
 		float m_x;
 		float m_y;
@@ -49,36 +49,35 @@ namespace mc
 		};
 
 		static bgfx::VertexDecl ms_decl;
-	};
+	};*/
 
+	//static PosColorVertex s_cubeVertices[8] =
+	//{
+	//	{ -1.0f,  1.0f,  1.0f, 0xff000000 }
+	//	, { 1.0f,  1.0f,  1.0f, 0xff0000ff }
+	//	, { -1.0f, -1.0f,  1.0f, 0xff00ff00 }
+	//	, { 1.0f, -1.0f,  1.0f, 0xff00ffff }
+	//	, { -1.0f,  1.0f, -1.0f, 0xffff0000 }
+	//	, { 1.0f,  1.0f, -1.0f, 0xffff00ff }
+	//	, { -1.0f, -1.0f, -1.0f, 0xffffff00 }
+	//	, { 1.0f, -1.0f, -1.0f, 0xffffffff }
+	//};
 
-	static PosColorVertex s_cubeVertices[8] =
-	{
-		{ -1.0f,  1.0f,  1.0f, 0xff000000 }
-		, { 1.0f,  1.0f,  1.0f, 0xff0000ff }
-		, { -1.0f, -1.0f,  1.0f, 0xff00ff00 }
-		, { 1.0f, -1.0f,  1.0f, 0xff00ffff }
-		, { -1.0f,  1.0f, -1.0f, 0xffff0000 }
-		, { 1.0f,  1.0f, -1.0f, 0xffff00ff }
-		, { -1.0f, -1.0f, -1.0f, 0xffffff00 }
-		, { 1.0f, -1.0f, -1.0f, 0xffffffff }
-	};
-
-	static const uint16_t s_cubeIndices[36] =
-	{
-		0, 1, 2, // 0
-		1, 3, 2,
-		4, 6, 5, // 2
-		5, 6, 7,
-		0, 2, 4, // 4
-		4, 2, 6,
-		1, 5, 3, // 6
-		5, 7, 3,
-		0, 4, 1, // 8
-		4, 5, 1,
-		2, 3, 6, // 10
-		6, 3, 7,
-	};
+	//static const uint16_t s_cubeIndices[36] =
+	//{
+	//	0, 1, 2, // 0
+	//	1, 3, 2,
+	//	4, 6, 5, // 2
+	//	5, 6, 7,
+	//	0, 2, 4, // 4
+	//	4, 2, 6,
+	//	1, 5, 3, // 6
+	//	5, 7, 3,
+	//	0, 4, 1, // 8
+	//	4, 5, 1,
+	//	2, 3, 6, // 10
+	//	6, 3, 7,
+	//};
 	//struct PosColorTexCoord0Vertex
 	//{
 	//	float m_x;
@@ -206,15 +205,15 @@ namespace mc
 			PosColorVertex::init();
 
 			// Create static vertex buffer.
-			m_vbh = bgfx::createVertexBuffer(
-				bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices))
-				, PosColorVertex::ms_decl
-			);
+			//m_vbh = bgfx::createVertexBuffer(
+			//	bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices))
+			//	, PosColorVertex::ms_decl
+			//);
 
-			// Create static index buffer.
-			m_ibh = bgfx::createIndexBuffer(
-				bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices))
-			);
+			//// Create static index buffer.
+			//m_ibh = bgfx::createIndexBuffer(
+			//	bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices))
+			//);
 
 			// Create program from shaders.
 			m_program = loadProgram("vs_instancing", "fs_instancing");
@@ -239,8 +238,6 @@ namespace mc
 			imguiDestroy();
 
 			// Cleanup.
-			bgfx::destroy(m_ibh);
-			bgfx::destroy(m_vbh);
 			bgfx::destroy(m_program);
 			// bgfx::destroy(m_skyProgram);
 
@@ -339,11 +336,11 @@ namespace mc
 				cameraGetPosition(pos);
 				cameraGetViewMtx(m_viewMtx);
 
-				for (auto& mesh : mPreRenderSystem.getMeshes(pos[0]/16/2, pos[2]/16/2, 1.0, 2))
-				//for (auto& mesh : mPreRenderSystem.getMeshes(0, 0, 1.0, 2)) 
+				for (auto& mesh : mPreRenderSystem.getMeshes(pos[0] / 16 / 2, pos[2] / 16 / 2, 1.0, 2))
+					//for (auto& mesh : mPreRenderSystem.getMeshes(0, 0, 1.0, 2)) 
 				{
 					//TODO render mesh
-					renderChunk(*(mesh->hack));
+					renderChunk(*(mesh));
 				}
 			}
 
@@ -352,62 +349,26 @@ namespace mc
 			bgfx::frame();
 			return true;
 		}
-		void renderChunk(const Chunk& chunk)
+		//void renderChunk(const Chunk& chunk)
+		void renderChunk(const Mesh& mesh)
 		{
 			bx::mtxProj(m_projMtx, 60.0f, float(mWidth) / float(mHeight), 0.1f, 2000.0f, bgfx::getCaps()->homogeneousDepth);
 			bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
 			//TODO use C++
 			float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
-			// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
-			const uint16_t instanceStride = 80;
-			const uint32_t numInstances = 16 * 16 * 16;
-			if (numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
-			{
-				bgfx::InstanceDataBuffer idb;
-				bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
-				uint8_t* data = idb.data;
 
-				for (uint32_t y = 0; y < 16; ++y)
-				{
-					for (uint32_t z = 0; z < 16; ++z)
-					{
-						for (uint32_t x = 0; x < 16; ++x)
-						{
-							if (chunk.getBlock(x, y, z).type == BlockType::DIRT)
-							{
-								float* mtx = (float*)data;
-								//bx::mtxRotateXY(mtx, time + x * 0.21f, time + y * 0.37f);
-								bx::mtxRotateXY(mtx, 0, 0);
-								mtx[12] = float(x)*2.0f + (16 * chunk.getX() * 2.0f);
-								mtx[13] = float(y)*2.0f;
-								mtx[14] = float(z)*2.0f + (16 * chunk.getZ() * 2.0f);
+			bgfx::setVertexBuffer(0, *(mesh.getVertexBufferHandle()));
+			bgfx::setIndexBuffer(*(mesh.getIndexBufferHandle()));
 
-								float* color = (float*)&data[64];
-								color[0] = 0.0f;// bx::sin(time + float(x) / 11.0f)*0.5f + 0.5f;
-								color[1] = 1.0f;// bx::cos(time + float(y) / 11.0f)*0.5f + 0.5f;
-								color[2] = 0.0f;//bx::sin(time*3.0f)*0.5f + 0.5f;
-								color[3] = 1.0f;
+			// Set instance data buffer.
+			//bgfx::setInstanceDataBuffer(&idb);
 
-								data += instanceStride;
-							}
-						}
-					}
-				}
+			// Set render states.
+			bgfx::setState(BGFX_STATE_DEFAULT);
 
-				// Set vertex and index buffer.
-				bgfx::setVertexBuffer(0, m_vbh);
-				bgfx::setIndexBuffer(m_ibh);
-
-				// Set instance data buffer.
-				bgfx::setInstanceDataBuffer(&idb);
-
-				// Set render states.
-				bgfx::setState(BGFX_STATE_DEFAULT);
-
-				// Submit primitive for rendering to view 0.
-				bgfx::submit(0, m_program);
-			}
+			// Submit primitive for rendering to view 0.
+			bgfx::submit(0, m_program);
 
 		}
 	private:
@@ -422,10 +383,7 @@ namespace mc
 
 		bgfx::FrameBufferHandle m_fbh;
 
-
 		uint32_t m_debug;
-		bgfx::VertexBufferHandle m_vbh;
-		bgfx::IndexBufferHandle  m_ibh;
 		bgfx::ProgramHandle m_program;
 		bgfx::ProgramHandle m_skyProgram;
 

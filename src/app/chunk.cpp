@@ -19,4 +19,9 @@ namespace mc
 		++mVersion; //TODO mikor betoltjuk/setupoljuk a chunkot kurva sok ilyet hivunk, ehelyett 1 versiont eleg novelni olyankor
 	}
 
+	bool Chunk::isBlockType(BlockType type, uint8_t x, uint8_t y, uint8_t z)
+	{
+		return mData[idAt(x, y, z)].type == type;
+	}
+
 }
