@@ -67,6 +67,21 @@ namespace mc
 		2, 3, 6, // 10
 		6, 3, 7,
 	};
+	static const uint16_t s_cubeTriStrip[] =
+	{
+		0, 1, 2,
+		3,
+		7,
+		1,
+		5,
+		0,
+		4,
+		2,
+		6,
+		7,
+		4,
+		5,
+	};
 
 	/**
 	*         VERTEX NUMBER/NAMES
@@ -99,51 +114,54 @@ namespace mc
 
 	struct Mesh
 	{
+		int x = 0;
+		int z = 0;
 		Mesh() = default;
 		Mesh(const Mesh&) = delete;
 		Mesh& operator=(Mesh&) = delete;
 		Mesh(Mesh&&) = default;
-		~Mesh() = default;
-		Chunk* hack;
+		~Mesh()
+		{
+			bgfx::destroy(getVertexBufferHandle());
+			bgfx::destroy(getIndexBufferHandle()); 
+		}
 
 		// --- gabor -------
-		core::Vector<PosColorVertex*> vertices;
+		core::Vector<PosColorVertex> vertices;
 		core::Vector<uint16_t> indices;
 		uint16_t numberOfIndices = 0;
-		std::unique_ptr<bgfx::VertexBufferHandle> vbh;
-		std::unique_ptr<bgfx::IndexBufferHandle> ibh;
-		const bgfx::Memory* vMem;
-		const bgfx::Memory* iMem;
+		bgfx::VertexBufferHandle vbh;
+		bgfx::IndexBufferHandle ibh;
 
 		void addVertices(Side side, int x, int y, int z) {
-			uint8_t vBegin = 4 * (int)side;
+			uint8_t vBegin = 3 * (int)side;
 			for (auto i = vBegin; i < vBegin + 6; i++)
 			{
-				PosColorVertex clone = PosColorVertex(s_cubeVertices[i]);
+				PosColorVertex clone = s_cubeVertices[s_cubeIndices[i]];
 				clone.m_x += 2 * x;
 				clone.m_y += 2 * y;
 				clone.m_z += 2 * z;
-				vertices.push_back(&clone);
+				vertices.push_back(clone);
 				indices.push_back(numberOfIndices++);
 			}
 		}
 
 
 		void createHandlers() {
-			size_t numVertices = vertices.size();
-			vMem = bgfx::copy(vertices.data(), numVertices);
-			vbh = std::make_unique<bgfx::VertexBufferHandle>(bgfx::createVertexBuffer(vMem, PosColorVertex::ms_decl));
+			auto vMem = bgfx::copy(vertices.data(), sizeof(vertices[0])*vertices.size());
+			vbh = bgfx::createVertexBuffer(vMem, PosColorVertex::ms_decl);
+			vertices.clear();
 			
-			size_t numIndices = indices.size();
-			iMem = bgfx::copy(indices.data(), numIndices);
-			ibh = std::make_unique<bgfx::IndexBufferHandle>(bgfx::createIndexBuffer(iMem));
+			auto iMem = bgfx::copy(indices.data(), sizeof(indices[0])*indices.size());
+			ibh = bgfx::createIndexBuffer(iMem);
+			indices.clear(); 
 		}
 
-		bgfx::VertexBufferHandle* getVertexBufferHandle() const {
-			return vbh.get();
+		bgfx::VertexBufferHandle getVertexBufferHandle() const {
+			return vbh;
 		}
-		bgfx::IndexBufferHandle* getIndexBufferHandle() const {
-			return ibh.get();
+		bgfx::IndexBufferHandle getIndexBufferHandle() const {
+			return ibh;
 		}
 
 
@@ -182,42 +200,43 @@ namespace mc
 		std::unique_ptr<Mesh> cookMesh(Chunk* chunk)
 		{
 			auto m = std::make_unique<Mesh>();
-			m->hack = chunk;
 			for (auto y = 0; y < Chunk::HEIGHT; y++)
 			{
 				for (auto z = 0; z < Chunk::WIDTH; z++)
 				{
 					for (auto x = 0; x < Chunk::WIDTH; x++)
 					{
-						if (x == 0 || chunk->isBlockType(BlockType::AIR, x-1, y, z))
+						if ( x == 0 || chunk->isBlockType(BlockType::AIR, x-1, y, z))
 						{
 							m->addVertices(Side::LEFT, x, y, z);
 						}
-						if (x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
+						if ( x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
 						{
 							m->addVertices(Side::RIGHT, x, y, z);
 						}
 
-						if (y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
+						if ( y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
 						{
 							m->addVertices(Side::UP, x, y, z);
 						}
-						if (y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
+						if ( y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
 						{
 							m->addVertices(Side::DOWN, x, y, z);
 						}
 
-						if (z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
+						if ( z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
 						{
 							m->addVertices(Side::FRONT, x, y, z);
 						}
-						if (z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
+						if ( z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
 						{
 							m->addVertices(Side::BACK, x, y, z);
 						}
 					}
 				}
 			}
+			m->x = chunk->getX();
+			m->z = chunk->getZ();
 			m->createHandlers();
 			return std::move(m);
 		}

@@ -2,14 +2,6 @@
 
 
 
-RenderSystem::RenderSystem()
-{
-}
-
-
-RenderSystem::~RenderSystem()
-{
-}
 namespace mc
 { 
 
