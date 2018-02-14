@@ -22,11 +22,11 @@ namespace mc {
 		glm::vec3 farCenterPoint = cameraData.pos + ray * cameraData.farDist; 
 		glm::vec3 nearCenterPoint = cameraData.pos + ray * cameraData.nearDist;
 
-		glm::vec3 rightPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f;
+		glm::vec3 rightPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
 		glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint-cameraData.pos));
 
-		glm::vec3 leftPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
-		glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint-cameraData.pos));
+		glm::vec3 leftPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f;
+		glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint-cameraData.pos)) * -1.0f;
 
 		glm::vec3 upPlanePoint = nearCenterPoint + cameraData.up * nearHeight / 2.0f;
 		glm::vec3 upPlaneNormal = glm::cross(cameraData.up, glm::normalize(upPlanePoint-cameraData.pos));
@@ -40,33 +40,41 @@ namespace mc {
 		glm::vec3 farPlanePoint = farCenterPoint;
 		glm::vec3 farPlaneNormal = -ray;
 
-		std::array<Plane, 1> planeNormals = {
-			//Plane{rightPlaneNormal,rightPlanePoint}
-			//,Plane{leftPlaneNormal,leftPlanePoint}
-			//,Plane{upPlaneNormal,upPlanePoint}
-			//,Plane{downPlaneNormal,downPlanePoint}
-			//,Plane{farPlaneNormal,farPlanePoint}
-			Plane{nearPlaneNormal,nearPlanePoint}
+		std::array<Plane, 3> planes = {
+			Plane{rightPlaneNormal,rightPlanePoint}
+			, Plane{leftPlaneNormal,leftPlanePoint}
+			/*, Plane{upPlaneNormal,upPlanePoint}
+			, Plane{downPlaneNormal,downPlanePoint}*/
+			//, Plane{farPlaneNormal,farPlanePoint}
+			, Plane{nearPlaneNormal,nearPlanePoint}
 		};
-
 
 		int offset = cameraData.chunkSize*cameraData.blockSize;
 		for (auto& chunk : nearbyChunks)
 		{ 
 			bool inside = true;
-			for (auto& plane : planeNormals)
+			for (auto& plane : planes)
 			{
-				glm::vec3 positive(chunk->getX()*offset, 0, chunk->getZ()*offset);
+				//glm::vec3 positive(chunk->getX()*offset, 0, chunk->getZ()*offset);
+				glm::vec3 positive(chunk->getX()*offset, cameraData.pos.y, chunk->getZ()*offset);
 				if (plane.normal.x >= 0) positive.x += offset;
 				if (plane.normal.z >= 0) positive.z += offset; 
 
-				auto a = glm::normalize(glm::cross(plane.normal, (plane.point - positive)));
-				auto b = glm::dot(plane.normal, a);
+				if (plane.distance(positive) < 0)
+				{
+					inside = false;
+					break;
+				}
+
+				//auto a = glm::normalize(glm::cross(plane.normal, (plane.point - positive)));
+				/*auto b = glm::dot(plane.normal, positive);
 				if (b < -0.0000001 )
 				{
 					inside = false;
 					break;
-				} 
+				}*/
+
+
 				//glm::vec3 negative(chunk->getX()*offset+offset, 0, chunk->getZ()*offset+offset);
 				//if (plane.normal.x >= 0) positive.x -= offset;
 				//if (plane.normal.z >= 0) positive.z -= offset;

@@ -13,9 +13,15 @@ namespace mc {
 			:normal(aNormal)
 			, point(aPoint)
 		{ 
+			d = -glm::dot(normal, point);
 		}
 		glm::vec3 normal;
 		glm::vec3 point;
+		float d;
+
+		float Plane::distance(glm::vec3 &p) {
+			return ( d + glm::dot(normal, p) );
+		}
 	};
 
 	class CullingSystem {
