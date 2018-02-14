@@ -174,6 +174,8 @@ namespace mc
 			cameraGetAt(at);
 			mCameraData.lookAt = glm::vec3(at[0], at[1], at[2]);
 
+			mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
+
 			mCameraData.ratio = (float)m_width / (float)m_height;
 			mCameraData.farDist = (mCameraData.viewDistance - 1) * mCameraData.chunkSize * mCameraData.blockSize;
 		}
