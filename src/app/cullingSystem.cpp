@@ -43,9 +43,9 @@ namespace mc {
 		std::array<Plane, 3> planes = {
 			Plane{rightPlaneNormal,rightPlanePoint}
 			, Plane{leftPlaneNormal,leftPlanePoint}
-			/*, Plane{upPlaneNormal,upPlanePoint}
-			, Plane{downPlaneNormal,downPlanePoint}*/
-			//, Plane{farPlaneNormal,farPlanePoint}
+			//, Plane{upPlaneNormal,upPlanePoint}
+			// , Plane{downPlaneNormal,downPlanePoint}
+			// , Plane{farPlaneNormal,farPlanePoint}
 			, Plane{nearPlaneNormal,nearPlanePoint}
 		};
 
