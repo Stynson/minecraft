@@ -202,7 +202,7 @@ namespace mc
 		}
 
 		core::Vector<PosNormalTangentTexcoordVertex> vertices;
-		core::Vector<uint16_t> indices;
+		core::Vector<uint32_t> indices;
 		bgfx::VertexBufferHandle vbh;
 		bgfx::IndexBufferHandle ibh;
 
@@ -240,7 +240,7 @@ namespace mc
 			vertices.clear();
 
 			auto iMem = bgfx::copy(indices.data(), sizeof(indices[0])*indices.size());
-			ibh = bgfx::createIndexBuffer(iMem);
+			ibh = bgfx::createIndexBuffer(iMem,BGFX_BUFFER_INDEX32);
 			indices.clear();
 		}
 		size_t submitedVertices = 0;
@@ -269,10 +269,8 @@ namespace mc
 			bgfx::setVertexBuffer(0, vbh);
 			bgfx::setIndexBuffer(ibh);
 
-			// Bind textures.
 			bgfx::setTexture(0, texUniform, texHandle);
 
-			// Set render states.
 			bgfx::setState(0
 				| BGFX_STATE_RGB_WRITE
 				| BGFX_STATE_ALPHA_WRITE
@@ -298,6 +296,7 @@ namespace mc
 			auto newChunks = mCullingSystem.getCulledChunks(cameraData);
 			auto newMeshes = MeshMap();
 			auto result = core::Vector<Mesh*>();
+			static int lastBakeCount = -1;
 			int bakeCount = 0;
 			for (auto& chunk : newChunks)
 			{
@@ -315,12 +314,13 @@ namespace mc
 					newMeshes.insert(std::make_pair(chunk->getKey(), std::make_pair(chunk->getVersion(), std::move(mesh))));
 				}
 			}
-			if (bakeCount > 0)
+			if (bakeCount != lastBakeCount)
 			{
 				LOG("Baked %d number of chunks in this frame!\n", bakeCount);
 				LOG("%d number of chunks baked in total!\n", result.size());
 				LOG("%d number of chunks loaded in total!\n", (2 * cameraData.viewDistance + 1)*(2 * cameraData.viewDistance + 1));
 				LOG("%d vertices for terrain in total!\n\n", Mesh::sumVertexCount);
+				lastBakeCount = bakeCount;
 			}
 			std::swap(mOldMeshes, newMeshes);
 			return result;

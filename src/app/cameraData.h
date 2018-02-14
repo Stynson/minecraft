@@ -20,7 +20,7 @@ namespace mc
 			, view(1.0f)
 		{}
 		//More like game data
-		int viewDistance = 16; //chunks
+		int viewDistance = 14; //chunks
 		int chunkSize = 16;
 		//More like render data
 		float blockSize = 2;

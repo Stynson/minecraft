@@ -19,7 +19,8 @@ namespace mc {
 		glm::vec3 point;
 		float d;
 
-		float Plane::distance(glm::vec3 &p) {
+		float distance(glm::vec3 &p)
+        {
 			return ( d + glm::dot(normal, p) );
 		}
 	};
