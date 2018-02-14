@@ -30,7 +30,7 @@ namespace mc {
 			: mCellSystem(cellSystem)
 		{}
 
-		core::Vector<Chunk*> getCulledChunks(float x, float z, float atX, float atZ, const CameraData& cameraData);
+		core::Vector<Chunk*> getCulledChunks(const CameraData& cameraData);
 
 	private:
 		CellSystem& mCellSystem;

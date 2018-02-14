@@ -5,9 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace mc {
-	core::Vector<Chunk*> CullingSystem::getCulledChunks(float x, float z, float atX, float atZ, const CameraData& cameraData) 
+	core::Vector<Chunk*> CullingSystem::getCulledChunks(const CameraData& cameraData)
 	{
-		auto nearbyChunks =  mCellSystem.getNearbyChunks((int)x, (int)z, cameraData.viewDistance);
+		auto nearbyChunks = mCellSystem.getNearbyChunks(cameraData);
 		auto culledChunks = core::Vector<Chunk*>();
 		culledChunks.reserve(nearbyChunks.size());
 
@@ -19,20 +19,20 @@ namespace mc {
 		glm::vec3 ray = glm::normalize(cameraData.lookAt - cameraData.pos);
 		glm::vec3 rightVector = glm::cross(cameraData.up, ray);
 
-		glm::vec3 farCenterPoint = cameraData.pos + ray * cameraData.farDist; 
+		glm::vec3 farCenterPoint = cameraData.pos + ray * cameraData.farDist;
 		glm::vec3 nearCenterPoint = cameraData.pos + ray * cameraData.nearDist;
 
 		glm::vec3 rightPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
-		glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint-cameraData.pos));
+		glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint - cameraData.pos));
 
 		glm::vec3 leftPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f;
-		glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint-cameraData.pos)) * -1.0f;
+		glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint - cameraData.pos)) * -1.0f;
 
 		glm::vec3 upPlanePoint = nearCenterPoint + cameraData.up * nearHeight / 2.0f;
-		glm::vec3 upPlaneNormal = glm::cross(cameraData.up, glm::normalize(upPlanePoint-cameraData.pos));
+		glm::vec3 upPlaneNormal = glm::cross(cameraData.up, glm::normalize(upPlanePoint - cameraData.pos));
 
 		glm::vec3 downPlanePoint = nearCenterPoint + cameraData.up * nearHeight / 2.0f * -1.0f;
-		glm::vec3 downPlaneNormal = glm::cross(cameraData.up, glm::normalize(downPlanePoint-cameraData.pos));
+		glm::vec3 downPlaneNormal = glm::cross(cameraData.up, glm::normalize(downPlanePoint - cameraData.pos));
 
 		glm::vec3 nearPlanePoint = nearCenterPoint;
 		glm::vec3 nearPlaneNormal = ray;
@@ -51,13 +51,13 @@ namespace mc {
 
 		int offset = cameraData.chunkSize*cameraData.blockSize;
 		for (auto& chunk : nearbyChunks)
-		{ 
+		{
 			bool inside = true;
 			for (auto& plane : planes)
 			{
 				glm::vec3 positive(chunk->getX()*offset, 0, chunk->getZ()*offset);
 				if (plane.normal.x >= 0) positive.x += offset;
-				if (plane.normal.z >= 0) positive.z += offset; 
+				if (plane.normal.z >= 0) positive.z += offset;
 
 				if (plane.distance(positive) < 0)
 				{
@@ -80,8 +80,8 @@ namespace mc {
 
 				//if (glm::distance(plane.point, negative) < 0)
 				//	//INTERSECT 
-			} 
-			if(inside)
+			}
+			if (inside)
 				culledChunks.push_back(chunk);
 		}
 

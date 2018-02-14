@@ -2,7 +2,8 @@
 
 #include "chunk.h"
 #include "mapGenerator.h"
-#include <map>
+#include "cameraData.h"
+#include <unordered_map>
 #include "core.h"
 #include <memory>
 
@@ -15,10 +16,10 @@ namespace mc {
 		{
 		};
 		Chunk* getChunk(int x, int z) ;
-		core::Vector<Chunk*> getNearbyChunks(int x, int z, int distance) ;
+		core::Vector<Chunk*> getNearbyChunks(const CameraData& cameraData);
 
 	private:
-		core::Map<core::String, std::unique_ptr<Chunk>> mMap;
+		std::unordered_map<core::String, std::unique_ptr<Chunk>> mMap;
 		MapGenerator mGenerator;
 
 	};

@@ -260,9 +260,9 @@ namespace mc
 		PreRenderSystem(CullingSystem& cullingSystem)
 			:mCullingSystem(cullingSystem)
 		{}
-		std::vector<Mesh*> getMeshes(float x, float z, float atX, float atZ, const CameraData& cameraData)
+		std::vector<Mesh*> getMeshes(const CameraData& cameraData)
 		{
-			auto newChunks = mCullingSystem.getCulledChunks(x, z, atX, atZ, cameraData);
+			auto newChunks = mCullingSystem.getCulledChunks(cameraData);
 			auto newMeshes = MeshMap();
 			auto result = core::Vector<Mesh*>();
 			int bakeCount = 0;

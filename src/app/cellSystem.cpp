@@ -6,14 +6,20 @@ namespace mc {
 		core::String key = std::to_string(x).c_str();
 		key += "_";
 		key += std::to_string(z).c_str();
-		if (!mMap.count(key)) {
-			mMap.insert(std::make_pair(key,std::move(mGenerator.generate(x, z))));
+		auto it = mMap.find(key);
+		if (it == mMap.end())
+		{
+			mMap.insert(it, std::make_pair(key, std::move(mGenerator.generate(x, z))));
 		}
 		return mMap[key].get();
 	}
 
-	core::Vector<Chunk*> CellSystem::getNearbyChunks(int x, int z, int distance) 
+	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData)
 	{
+		int offset = cameraData.chunkSize * cameraData.blockSize;
+		int x = cameraData.pos.x / offset;
+		int z = cameraData.pos.z / offset;
+		auto distance = cameraData.viewDistance;
 		auto nearbyChunks = core::Vector<Chunk*>(0);
 		nearbyChunks.reserve((distance + 1) * (distance + 1));
 		for (auto i = x - distance; i <= x + distance; i++) {
