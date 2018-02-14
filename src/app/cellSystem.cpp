@@ -6,8 +6,10 @@ namespace mc {
 		core::String key = std::to_string(x).c_str();
 		key += "_";
 		key += std::to_string(z).c_str();
-		if (!mMap.count(key)) {
-			mMap.insert(std::make_pair(key,std::move(mGenerator.generate(x, z))));
+		auto it = mMap.find(key);
+		if (it == mMap.end())
+		{
+			mMap.insert(it, std::make_pair(key, std::move(mGenerator.generate(x, z))));
 		}
 		return mMap[key].get();
 	}
