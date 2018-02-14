@@ -13,7 +13,7 @@
 
 #include <glm/vec3.hpp>
 
-#define LOG( s ) { bx::debugPrintf(s); }
+#define LOG( ... ) { bx::debugPrintf(__VA_ARGS__); }
 
 //#define LOG( s )            \
 //{                             \

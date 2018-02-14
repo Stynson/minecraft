@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "chunk.h"
 #include "cullingSystem.h"
+#include "cameraData.h"
 #include "core.h"
 
 
@@ -113,18 +114,25 @@ namespace mc
 	};
 
 
+
 	struct Mesh
 	{
 		int x = 0;
 		int z = 0;
-		Mesh() = default;
+		Mesh()
+		{ 
+			vertices.reserve(16 * 16 * 16);
+			indices.reserve(16 * 16 * 16);
+		}
 		Mesh(const Mesh&) = delete;
 		Mesh& operator=(Mesh&) = delete;
 		Mesh(Mesh&&) = default;
+		static size_t sumVertexCount;
 		~Mesh()
 		{
 			bgfx::destroy(getVertexBufferHandle());
 			bgfx::destroy(getIndexBufferHandle()); 
+			sumVertexCount -= submitedVertices;
 		}
 
 		// --- gabor -------
@@ -151,12 +159,15 @@ namespace mc
 		void createHandlers() {
 			auto vMem = bgfx::copy(vertices.data(), sizeof(vertices[0])*vertices.size());
 			vbh = bgfx::createVertexBuffer(vMem, PosColorVertex::ms_decl);
+			submitedVertices = vertices.size();
+			sumVertexCount += submitedVertices;
 			vertices.clear();
 			
 			auto iMem = bgfx::copy(indices.data(), sizeof(indices[0])*indices.size());
 			ibh = bgfx::createIndexBuffer(iMem);
 			indices.clear(); 
 		}
+		size_t submitedVertices = 0;
 
 		bgfx::VertexBufferHandle getVertexBufferHandle() const {
 			return vbh;
@@ -174,11 +185,12 @@ namespace mc
 		PreRenderSystem(CullingSystem& cullingSystem)
 			:mCullingSystem(cullingSystem)
 		{}
-		std::vector<Mesh*> getMeshes(float x, float z, float direction, int distance)
+		std::vector<Mesh*> getMeshes(float x, float z, float atX, float atZ, const CameraData& cameraData)
 		{
-			auto newChunks = mCullingSystem.getCulledChunks(x, z, direction, distance);
+			auto newChunks = mCullingSystem.getCulledChunks(x, z, atX, atZ, cameraData);
 			auto newMeshes = MeshMap();
 			auto result = core::Vector<Mesh*>();
+			int bakeCount = 0;
 			for (auto& chunk : newChunks)
 			{
 				auto it = mOldMeshes.find(chunk->getKey());
@@ -189,16 +201,24 @@ namespace mc
 				}
 				else
 				{
-					auto mesh = cookMesh(chunk);
+					auto mesh = bakeMesh(chunk);
+					++bakeCount;
 					result.push_back(mesh.get());
 					newMeshes.insert(std::make_pair(chunk->getKey(), std::make_pair(chunk->getVersion(), std::move(mesh))));
 				}
+			}
+			if (bakeCount > 0)
+			{
+				LOG("Baked %d number of chunks in this frame!\n", bakeCount);
+				LOG("%d number of chunks baked in total!\n", result.size());
+				LOG("%d number of chunks loaded in total!\n", (2*cameraData.viewDistance + 1)*(2*cameraData.viewDistance + 1));
+				LOG("%d vertices for terrain in total!\n\n", Mesh::sumVertexCount);
 			}
 			std::swap(mOldMeshes, newMeshes);
 			return result;
 		}
 	private:
-		std::unique_ptr<Mesh> cookMesh(Chunk* chunk)
+		std::unique_ptr<Mesh> bakeMesh(Chunk* chunk)
 		{
 			auto m = std::make_unique<Mesh>();
 			for (auto y = 0; y < Chunk::HEIGHT; y++)

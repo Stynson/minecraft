@@ -5,12 +5,28 @@
 
 #include "common.h"
 #include "camera.h"
+#include "cameraData.h"
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 #include "preRenderSystem.h"
+#include <glm/vec3.hpp> 
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace mc
 {
+	inline glm::tmat4x4<float, glm::defaultp> perspective(float fovy, float aspect, float zNear, float zFar)
+	{
+		glm::tmat4x4<float, glm::defaultp> mtx;
+		//Dunno why this works this way...
+#	if GLM_COORDINATE_SYSTEM != GLM_LEFT_HANDED
+		bx::mtxProjLh(&mtx[0][0], glm::degrees(fovy), aspect, zNear, zFar, bgfx::getCaps()->homogeneousDepth);
+#	else
+		bx::mtxProjRh(&mtx[0][0], glm::degrees(fovy), aspect, zNear, zFar, bgfx::getCaps()->homogeneousDepth);
+#	endif
+		return mtx;
+	}
 
 	//struct PosColorVertex
 	//{
@@ -116,11 +132,11 @@ namespace mc
 			// Create program from shaders.
 			m_program = loadProgram("vs_cubes", "fs_cubes");
 
-			m_timeOffset = bx::getHPCounter(); 
+			m_timeOffset = bx::getHPCounter();
 
 
 			imguiCreate();
-			
+
 			cameraCreate();
 
 			const float initialPos[3] = { 5.0f, 3.0, 0.0f };
@@ -154,6 +170,7 @@ namespace mc
 				last = now;
 				const double freq = double(bx::getHPFrequency());
 				const float deltaTime = float(frameTime / freq);
+
 				imguiBeginFrame(m_mouseState.m_mx
 					, m_mouseState.m_my
 					, (m_mouseState.m_buttons[entry::MouseButton::Left] ? IMGUI_MBUT_LEFT : 0)
@@ -170,23 +187,10 @@ namespace mc
 
 				float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
-				float at[3] = { 0.0f, 0.0f,   0.0f };
-				float eye[3] = { -50.0f, 30.0f, -50.0f };
+				updateCamera(deltaTime);
 
-				float view[16];
-////////				bx::mtxLookAt(view, eye, at);
-
-
-				cameraUpdate(deltaTime, m_mouseState);
-				cameraGetViewMtx(view);
-
-				float proj[16];
-				bx::mtxProj(proj, 60.0f, float(m_width) / float(m_height), 0.1f, 500.0f, bgfx::getCaps()->homogeneousDepth);
-				bgfx::setViewTransform(0, view, proj);
-
-
-
-				// Set view 0 default viewport.
+				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
 				// This dummy draw call is here to make sure that view 0 is cleared
@@ -195,17 +199,23 @@ namespace mc
 
 				float pos[3];
 				cameraGetPosition(pos);
-				auto meshes = mPreRenderSystem.getMeshes(pos[0]/16/2, pos[2]/16/2, 1, 5);
+				float at[3];
+				cameraGetAt(at);
+				auto meshes = mPreRenderSystem.getMeshes(pos[0] / 16 / 2, pos[2] / 16 / 2, at[0], at[2], mCameraData);
 				//auto meshes = mPreRenderSystem.getMeshes(0, 0, 1, 2);
 
 				for (auto& mesh : meshes)
 				{
-					float mtx[16];
-					bx::mtxRotateXY(mtx, 0, 0);
-					mtx[12] = float(mesh->x)*2.0f*16.0f;
-					mtx[13] = 0.0f;
-					mtx[14] = float(mesh->z)*2.0f*16.0f;
-					bgfx::setTransform(mtx); 
+					auto transform = glm::mat4(1.0f);
+					transform = glm::translate(transform, glm::vec3((float)mesh->x*2.0f*16.0f, 0, (float)mesh->z*2.0f*16.0f));
+					bgfx::setTransform(&transform[0][0]);
+
+					//float mtx[16];
+					//bx::mtxRotateXY(mtx, 0, 0);
+					//mtx[12] = float(mesh->x)*2.0f*16.0f;
+					//mtx[13] = 0.0f;
+					//mtx[14] = float(mesh->z)*2.0f*16.0f;
+					//bgfx::setTransform(mtx);
 
 					// Set vertex and index buffer.
 					bgfx::setVertexBuffer(0, mesh->getVertexBufferHandle());
@@ -214,7 +224,7 @@ namespace mc
 					// Set render states.
 					bgfx::setState(0
 						| BGFX_STATE_DEFAULT
-					//	| BGFX_STATE_PT_TRISTRIP
+						//	| BGFX_STATE_PT_TRISTRIP
 					);
 
 					// Submit primitive for rendering to view 0.
@@ -230,6 +240,28 @@ namespace mc
 
 			return false;
 		}
+		void updateCamera(float deltaTime)
+		{
+			cameraUpdate(deltaTime, m_mouseState);
+
+			float view[16];
+			cameraGetViewMtx(view);
+			mCameraData.view = glm::mat4(1.0f);
+			for (int i = 0; i < 4; ++i)
+				for (int j = 0; j < 4; ++j)
+					mCameraData.view[i][j] = view[i * 4 + j];
+
+			float pos[3];
+			cameraGetPosition(pos);
+			mCameraData.pos = glm::vec3(pos[0], pos[1], pos[2]);
+
+			float at[3];
+			cameraGetAt(at);
+			mCameraData.lookAt = glm::vec3(at[0], at[1], at[2]);
+
+			mCameraData.ratio = (float)m_width / (float)m_height;
+			mCameraData.farDist = (mCameraData.viewDistance - 1) * mCameraData.chunkSize * mCameraData.blockSize;
+		}
 
 		entry::MouseState m_mouseState;
 
@@ -242,10 +274,13 @@ namespace mc
 		bgfx::ProgramHandle m_program;
 		int64_t m_timeOffset;
 
-		CellSystem mCellSystem = MapGenerator{0};
+		CellSystem mCellSystem = MapGenerator{ 0 };
 		CullingSystem mCullingSystem = mCellSystem;
 		PreRenderSystem mPreRenderSystem = mCullingSystem;
+
+		CameraData mCameraData;
 	};
+
 
 } // namespace
 
