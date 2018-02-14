@@ -53,21 +53,16 @@ namespace mc
 		,{ 1.0f, -1.0f, -1.0f, 0xffffffff }
 	};
 
-	static const uint16_t s_cubeIndices[36] =
+	static const uint16_t s_cubeFaceIndices[24] =
 	{
-		0, 1, 2, // 0
-		1, 3, 2,
-		4, 6, 5, // 2
-		5, 6, 7,
-		0, 2, 4, // 4
-		4, 2, 6,
-		1, 5, 3, // 6
-		5, 7, 3,
-		0, 4, 1, // 8
-		4, 5, 1,
-		2, 3, 6, // 10
-		6, 3, 7,
+		0, 1, 2, 3
+		,4, 6, 5, 7
+		,0, 2, 4, 6
+		,1, 5, 3, 7
+		,0, 4, 1, 5
+		,2, 3, 6, 7
 	};
+
 
 	static const uint16_t s_cubeTriStrip[] =
 	{
@@ -103,7 +98,7 @@ namespace mc
 	*
 	* */
 
-	enum class Side : uint8_t 
+	enum class Side : uint8_t
 	{
 		BACK = 0
 		, FRONT
@@ -120,7 +115,7 @@ namespace mc
 		int x = 0;
 		int z = 0;
 		Mesh()
-		{ 
+		{
 			vertices.reserve(16 * 16 * 16);
 			indices.reserve(16 * 16 * 16);
 		}
@@ -131,28 +126,32 @@ namespace mc
 		~Mesh()
 		{
 			bgfx::destroy(getVertexBufferHandle());
-			bgfx::destroy(getIndexBufferHandle()); 
+			bgfx::destroy(getIndexBufferHandle());
 			sumVertexCount -= submitedVertices;
 		}
 
 		// --- gabor -------
 		core::Vector<PosColorVertex> vertices;
 		core::Vector<uint16_t> indices;
-		uint16_t numberOfIndices = 0;
 		bgfx::VertexBufferHandle vbh;
 		bgfx::IndexBufferHandle ibh;
 
 		void addVertices(Side side, int x, int y, int z) {
-			uint8_t vBegin = 6 * (int)side;
-			for (auto i = vBegin; i < vBegin + 6; i++)
+			uint8_t vBegin = 4 * (int)side;
+			for (auto i = vBegin; i < vBegin + 4; i++)
 			{
-				PosColorVertex clone = s_cubeVertices[s_cubeIndices[i]];
+				PosColorVertex clone = s_cubeVertices[s_cubeFaceIndices[i]];
 				clone.m_x += 2 * x;
 				clone.m_y += 2 * y;
 				clone.m_z += 2 * z;
 				vertices.push_back(clone);
-				indices.push_back(numberOfIndices++);
 			}
+			indices.push_back(vertices.size() + 0);
+			indices.push_back(vertices.size() + 1);
+			indices.push_back(vertices.size() + 2);
+			indices.push_back(vertices.size() + 2);
+			indices.push_back(vertices.size() + 1);
+			indices.push_back(vertices.size() + 3);
 		}
 
 
@@ -162,10 +161,10 @@ namespace mc
 			submitedVertices = vertices.size();
 			sumVertexCount += submitedVertices;
 			vertices.clear();
-			
+
 			auto iMem = bgfx::copy(indices.data(), sizeof(indices[0])*indices.size());
 			ibh = bgfx::createIndexBuffer(iMem);
-			indices.clear(); 
+			indices.clear();
 		}
 		size_t submitedVertices = 0;
 
@@ -211,7 +210,7 @@ namespace mc
 			{
 				LOG("Baked %d number of chunks in this frame!\n", bakeCount);
 				LOG("%d number of chunks baked in total!\n", result.size());
-				LOG("%d number of chunks loaded in total!\n", (2*cameraData.viewDistance + 1)*(2*cameraData.viewDistance + 1));
+				LOG("%d number of chunks loaded in total!\n", (2 * cameraData.viewDistance + 1)*(2 * cameraData.viewDistance + 1));
 				LOG("%d vertices for terrain in total!\n\n", Mesh::sumVertexCount);
 			}
 			std::swap(mOldMeshes, newMeshes);
@@ -226,7 +225,7 @@ namespace mc
 				for (auto z = 0; z < Chunk::WIDTH; z++)
 				{
 					for (auto x = 0; x < Chunk::WIDTH; x++)
-					{ 
+					{
 						if (!chunk->isBlockType(BlockType::AIR, x, y, z))
 						{
 							if (x == 0 || chunk->isBlockType(BlockType::AIR, x - 1, y, z))
