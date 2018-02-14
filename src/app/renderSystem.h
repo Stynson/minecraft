@@ -71,6 +71,35 @@ namespace mc
 			// Load diffuse texture.
 			m_textureColor = loadTexture("textures/dirt.dds");
 
+			//m_skybox = loadTexture("textures/fieldstone-rgba.dds");
+			m_skybox = loadTexture("textures/skybox.dds");
+
+			core::Vector<PosNormalTangentTexcoordVertex> skyboxVert;
+			core::Vector<uint16_t> skyboxIndices;
+			for (auto i = 0; i < 24; i++)
+			{
+				PosNormalTangentTexcoordVertex clone = s_cubeVertices[i];
+				clone.m_x += 2;
+				clone.m_y += 2;
+				clone.m_z += 2;
+				skyboxVert.push_back(clone);
+			}
+			for (auto i = 0; i < 6; i ++)
+			{
+				skyboxIndices.push_back(i * 4 + 0);
+				skyboxIndices.push_back(i * 4 + 1);
+				skyboxIndices.push_back(i * 4 + 2);
+				skyboxIndices.push_back(i * 4 + 2);
+				skyboxIndices.push_back(i * 4 + 1);
+				skyboxIndices.push_back(i * 4 + 3);
+			}
+			auto vMem = bgfx::copy(skyboxVert.data(), sizeof(skyboxVert[0])*skyboxVert.size());
+			skyboxVbh = bgfx::createVertexBuffer(vMem, PosNormalTangentTexcoordVertex::ms_decl);
+			skyboxVert.clear();
+
+			auto iMem = bgfx::copy(skyboxIndices.data(), sizeof(skyboxIndices[0])*skyboxIndices.size());
+			skyboxIbh = bgfx::createIndexBuffer(iMem);
+			skyboxIndices.clear();
 
 			m_timeOffset = bx::getHPCounter();
 
@@ -132,13 +161,14 @@ namespace mc
 				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+				renderSkybox();
 
 				// This dummy draw call is here to make sure that view 0 is cleared
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				auto meshes = mPreRenderSystem.getMeshes(mCameraData);
 
+				auto meshes = mPreRenderSystem.getMeshes(mCameraData);
 				auto chunkOffset = mCameraData.blockSize * mCameraData.chunkSize;
 				for (auto& mesh : meshes)
 				{
@@ -154,6 +184,30 @@ namespace mc
 			}
 
 			return false;
+		}
+		void renderSkybox() {
+			auto transform = glm::mat4(1.0f);
+			transform = glm::translate(transform, mCameraData.pos - glm::vec3(2.0f, 2.0f, 2.0f));
+			transform = glm::translate(transform, glm::vec3(-75.0f));
+			transform = glm::scale(transform, glm::vec3(50.0f));
+			bgfx::setTransform(&transform[0][0]);
+
+			bgfx::setVertexBuffer(0, skyboxVbh);
+			bgfx::setIndexBuffer(skyboxIbh);
+
+			// Bind textures.
+			bgfx::setTexture(0, s_texColor, m_skybox);
+
+			// Set render states.
+			bgfx::setState(0
+				| BGFX_STATE_RGB_WRITE
+				| BGFX_STATE_ALPHA_WRITE
+				| BGFX_STATE_DEPTH_WRITE
+				| BGFX_STATE_DEPTH_TEST_LESS
+				| BGFX_STATE_MSAA
+				//| BGFX_STATE_CULL_CCW
+			);
+			bgfx::submit(0, m_program);
 		}
 		void updateCamera(float deltaTime)
 		{
@@ -191,6 +245,10 @@ namespace mc
 		bgfx::UniformHandle s_texColor;
 		bgfx::ProgramHandle m_program;
 		bgfx::TextureHandle m_textureColor;
+
+		bgfx::TextureHandle m_skybox;
+		bgfx::VertexBufferHandle skyboxVbh;
+		bgfx::IndexBufferHandle skyboxIbh;
 
 		int64_t m_timeOffset;
 

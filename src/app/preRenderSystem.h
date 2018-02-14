@@ -92,34 +92,34 @@ namespace mc
 	{
 		// BACK
 		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0 },
-	{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0 },
-	{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0x7fff },
-	{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0x7fff },
-	// FRONT
-	{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0 },
-	{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
-	{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0x7fff },
-	{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0x7fff },
-	// LEFT
-	{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0x7fff },
-	{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0 },
-	{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0x7fff },
-	{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
-	// RIGHT
-	{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0 },
-	{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0x7fff },
-	{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
-	{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0x7fff },
-	// UP
-	{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0 },
-	{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
-	{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0x7fff },
-	{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0x7fff },
-	// DOWN
-	{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0x7fff },
-	{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0x7fff },
-	{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0 },
-	{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0 },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0x7fff },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0x7fff },
+		// FRONT
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0 },
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0x7fff },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0x7fff },
+		// LEFT
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0x7fff },
+		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0 },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0x7fff },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
+		// RIGHT
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0 },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0x7fff },
+		// UP
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0 },
+		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0x7fff },
+		// DOWN
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0x7fff },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0 },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
 	};
 
 	static const uint16_t s_cubeFaceIndices[24] =
