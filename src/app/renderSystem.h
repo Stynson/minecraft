@@ -197,37 +197,22 @@ namespace mc
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				float pos[3];
-				cameraGetPosition(pos);
-				float at[3];
-				cameraGetAt(at);
-				auto meshes = mPreRenderSystem.getMeshes(pos[0] / 16 / 2, pos[2] / 16 / 2, at[0], at[2], mCameraData);
-				//auto meshes = mPreRenderSystem.getMeshes(0, 0, 1, 2);
+				auto meshes = mPreRenderSystem.getMeshes(mCameraData);
 
+				auto chunkOffset = mCameraData.blockSize * mCameraData.chunkSize;
 				for (auto& mesh : meshes)
 				{
 					auto transform = glm::mat4(1.0f);
-					transform = glm::translate(transform, glm::vec3((float)mesh->x*2.0f*16.0f, 0, (float)mesh->z*2.0f*16.0f));
+					transform = glm::translate(transform, glm::vec3((float)mesh->x*chunkOffset, 0, (float)mesh->z*chunkOffset));
 					bgfx::setTransform(&transform[0][0]);
 
-					//float mtx[16];
-					//bx::mtxRotateXY(mtx, 0, 0);
-					//mtx[12] = float(mesh->x)*2.0f*16.0f;
-					//mtx[13] = 0.0f;
-					//mtx[14] = float(mesh->z)*2.0f*16.0f;
-					//bgfx::setTransform(mtx);
-
-					// Set vertex and index buffer.
 					bgfx::setVertexBuffer(0, mesh->getVertexBufferHandle());
 					bgfx::setIndexBuffer(mesh->getIndexBufferHandle());
 
-					// Set render states.
 					bgfx::setState(0
 						| BGFX_STATE_DEFAULT
-						//	| BGFX_STATE_PT_TRISTRIP
-					);
-
-					// Submit primitive for rendering to view 0.
+						| BGFX_STATE_CULL_CW
+					); 
 					bgfx::submit(0, m_program);
 				}
 

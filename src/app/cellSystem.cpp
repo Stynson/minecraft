@@ -12,8 +12,12 @@ namespace mc {
 		return mMap[key].get();
 	}
 
-	core::Vector<Chunk*> CellSystem::getNearbyChunks(int x, int z, int distance) 
+	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData)
 	{
+		int offset = cameraData.chunkSize * cameraData.blockSize;
+		int x = cameraData.pos.x / offset;
+		int z = cameraData.pos.z / offset;
+		auto distance = cameraData.viewDistance;
 		auto nearbyChunks = core::Vector<Chunk*>(0);
 		nearbyChunks.reserve((distance + 1) * (distance + 1));
 		for (auto i = x - distance; i <= x + distance; i++) {
