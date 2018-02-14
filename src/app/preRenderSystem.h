@@ -20,47 +20,48 @@
 #include <bx/debug.h>
 #include <bx/math.h>
 #include <bx/rng.h>
+#include <bgfx/bgfx.h>
 
 namespace mc
 {
 	/*struct PosColorVertex
 	{
-		float m_x;
-		float m_y;
-		float m_z;
-		uint32_t m_abgr;
+	float m_x;
+	float m_y;
+	float m_z;
+	uint32_t m_abgr;
 
-		static void init()
-		{
-			ms_decl
-				.begin()
-				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-				.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-				.end();
-		};
+	static void init()
+	{
+	ms_decl
+	.begin()
+	.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+	.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+	.end();
+	};
 
-		static bgfx::VertexDecl ms_decl;
+	static bgfx::VertexDecl ms_decl;
 	};
 	static PosColorVertex s_cubeVertices[8] =
 	{
-		{ -1.0f,  1.0f,  1.0f, 0xff000000 }
-		,{ 1.0f,  1.0f,  1.0f, 0xff0000ff }
-		,{ -1.0f, -1.0f,  1.0f, 0xff00ff00 }
-		,{ 1.0f, -1.0f,  1.0f, 0xff00ffff }
-		,{ -1.0f,  1.0f, -1.0f, 0xffff0000 }
-		,{ 1.0f,  1.0f, -1.0f, 0xffff00ff }
-		,{ -1.0f, -1.0f, -1.0f, 0xffffff00 }
-		,{ 1.0f, -1.0f, -1.0f, 0xffffffff }
+	{ -1.0f,  1.0f,  1.0f, 0xff000000 }
+	,{ 1.0f,  1.0f,  1.0f, 0xff0000ff }
+	,{ -1.0f, -1.0f,  1.0f, 0xff00ff00 }
+	,{ 1.0f, -1.0f,  1.0f, 0xff00ffff }
+	,{ -1.0f,  1.0f, -1.0f, 0xffff0000 }
+	,{ 1.0f,  1.0f, -1.0f, 0xffff00ff }
+	,{ -1.0f, -1.0f, -1.0f, 0xffffff00 }
+	,{ 1.0f, -1.0f, -1.0f, 0xffffffff }
 	};
 
 	static const uint16_t s_cubeFaceIndices[24] =
 	{
-		0, 1, 2, 3
-		,4, 6, 5, 7
-		,0, 2, 4, 6
-		,1, 5, 3, 7
-		,0, 4, 1, 5
-		,2, 3, 6, 7
+	0, 1, 2, 3
+	,4, 6, 5, 7
+	,0, 2, 4, 6
+	,1, 5, 3, 7
+	,0, 4, 1, 5
+	,2, 3, 6, 7
 	};*/
 
 	struct PosNormalTangentTexcoordVertex
@@ -91,34 +92,34 @@ namespace mc
 	{
 		// BACK
 		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0 },
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0 },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0x7fff },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0x7fff },
-		// FRONT
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0 },
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0x7fff },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0x7fff },
-		// LEFT
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0x7fff },
-		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0 },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0x7fff },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
-		// RIGHT
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0 },
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0x7fff },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0x7fff },
-		// UP
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0 },
-		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0x7fff },
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0x7fff },
-		// DOWN
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0x7fff },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0x7fff },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0 },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
+	{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0 },
+	{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0x7fff },
+	{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0x7fff },
+	// FRONT
+	{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0 },
+	{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
+	{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0x7fff },
+	{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0x7fff },
+	// LEFT
+	{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0x7fff },
+	{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0 },
+	{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0x7fff },
+	{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
+	// RIGHT
+	{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0 },
+	{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0x7fff },
+	{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
+	{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0x7fff },
+	// UP
+	{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0 },
+	{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
+	{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0x7fff },
+	{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0x7fff },
+	// DOWN
+	{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0x7fff },
+	{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0x7fff },
+	{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0 },
+	{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
 	};
 
 	static const uint16_t s_cubeFaceIndices[24] =
@@ -226,10 +227,10 @@ namespace mc
 
 		void createHandlers() {
 			/*calcTangents(vertices.data()
-				, sizeof(vertices[0])*vertices.size()
-				, PosNormalTangentTexcoordVertex::ms_decl
-				, indices.data()
-				, sizeof(indices[0])*indices.size()
+			, sizeof(vertices[0])*vertices.size()
+			, PosNormalTangentTexcoordVertex::ms_decl
+			, indices.data()
+			, sizeof(indices[0])*indices.size()
 			);*/
 
 			auto vMem = bgfx::copy(vertices.data(), sizeof(vertices[0])*vertices.size());
@@ -249,6 +250,38 @@ namespace mc
 		}
 		bgfx::IndexBufferHandle getIndexBufferHandle() const {
 			return ibh;
+		}
+
+		int chunkSize = 16;
+		float blockSize = 2;
+
+		glm::vec3 getChunkPosition()
+		{
+			auto chunkOffset = chunkSize * blockSize;
+			return glm::vec3((float)x * chunkOffset, 0, (float)z * chunkOffset);
+		}
+
+		void submitMesh(bgfx::ViewId id, bgfx::ProgramHandle program, glm::mat4 transform, bgfx::UniformHandle& texUniform, bgfx::TextureHandle& texHandle)
+		{
+			transform = glm::translate(transform, getChunkPosition());
+			bgfx::setTransform(&transform[0][0]);
+
+			bgfx::setVertexBuffer(0, vbh);
+			bgfx::setIndexBuffer(ibh);
+
+			// Bind textures.
+			bgfx::setTexture(0, texUniform, texHandle);
+
+			// Set render states.
+			bgfx::setState(0
+				| BGFX_STATE_RGB_WRITE
+				| BGFX_STATE_ALPHA_WRITE
+				| BGFX_STATE_DEPTH_WRITE
+				| BGFX_STATE_DEPTH_TEST_LESS
+				| BGFX_STATE_MSAA
+				| BGFX_STATE_CULL_CW
+			);
+			bgfx::submit(id, program);
 		}
 
 

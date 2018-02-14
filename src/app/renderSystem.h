@@ -143,31 +143,7 @@ namespace mc
 				for (auto& mesh : meshes)
 				{
 					auto transform = glm::mat4(1.0f);
-					transform = glm::translate(transform, glm::vec3((float)mesh->x*chunkOffset, 0, (float)mesh->z*chunkOffset));
-					bgfx::setTransform(&transform[0][0]);
-
-					bgfx::setVertexBuffer(0, mesh->getVertexBufferHandle());
-					bgfx::setIndexBuffer(mesh->getIndexBufferHandle());
-
-					// Bind textures.
-					bgfx::setTexture(0, s_texColor, m_textureColor);
-
-					// Set render states.
-					bgfx::setState(0
-						| BGFX_STATE_RGB_WRITE
-						| BGFX_STATE_ALPHA_WRITE
-						| BGFX_STATE_DEPTH_WRITE
-						| BGFX_STATE_DEPTH_TEST_LESS
-						| BGFX_STATE_MSAA
-						| BGFX_STATE_CULL_CW
-					);
-
-					// Submit primitive for rendering to view 0.
-					/*bgfx::setState(0
-						| BGFX_STATE_DEFAULT
-						| BGFX_STATE_CULL_CW
-					); */
-					bgfx::submit(0, m_program);
+					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
 				// Advance to next frame. Rendering thread will be kicked to
