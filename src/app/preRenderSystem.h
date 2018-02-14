@@ -23,7 +23,7 @@
 
 namespace mc
 {
-	struct PosColorVertex
+	/*struct PosColorVertex
 	{
 		float m_x;
 		float m_y;
@@ -61,40 +61,110 @@ namespace mc
 		,1, 5, 3, 7
 		,0, 4, 1, 5
 		,2, 3, 6, 7
+	};*/
+
+	struct PosNormalTangentTexcoordVertex
+	{
+		float m_x;
+		float m_y;
+		float m_z;
+		uint32_t m_normal;
+		uint32_t m_tangent;
+		int16_t m_u;
+		int16_t m_v;
+
+		static void init()
+		{
+			ms_decl
+				.begin()
+				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+				.add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true, true)
+				.add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Uint8, true, true)
+				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Int16, true, true)
+				.end();
+		}
+
+		static bgfx::VertexDecl ms_decl;
 	};
 
-
-	static const uint16_t s_cubeTriStrip[] =
+	static PosNormalTangentTexcoordVertex s_cubeVertices[24] =
 	{
-		0, 1, 2,
-		3,
-		7,
-		1,
-		5,
-		0,
-		4,
-		2,
-		6,
-		7,
-		4,
-		5,
+		// BACK
+		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0 },
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0 },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0x7fff },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0x7fff },
+		// FRONT
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0 },
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0x7fff },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0x7fff },
+		// LEFT
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0x7fff },
+		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0 },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0x7fff },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
+		// RIGHT
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0 },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0x7fff },
+		// UP
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0 },
+		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0x7fff },
+		// DOWN
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0x7fff },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0 },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
+	};
+
+	static const uint16_t s_cubeFaceIndices[24] =
+	{
+		0,  2,  1,  3,
+		4,  6,  5,  7,
+
+		8,  10,  9, 11,
+		12, 14, 13, 15,
+
+		16, 18, 17, 19,
+		20, 22, 21, 23
+	};
+	static const uint16_t s_cubeIndices[36] =
+	{
+		0,  2,  1,
+		1,  2,  3,
+		4,  5,  6,
+		5,  7,  6,
+
+		8, 10,  9,
+		9, 10, 11,
+		12, 13, 14,
+		13, 15, 14,
+
+		16, 18, 17,
+		17, 18, 19,
+		20, 21, 22,
+		21, 23, 22,
 	};
 
 	/**
 	*         VERTEX NUMBER/NAMES
 	*
-	*                     0(LUF)         1(RUF)
+	*         (-1,1,1)    0(LUF)         1(RUF) (1,1,1)
 	*                       *--------------*
-	*                      /|             /|
-	*   y           4(LUB)/ |      5(RUB)/ |
+	*         (-1,1,-1)    /|             /|
+	*   y           4(LUB)/ |      5(RUB)/ | (1,1,-1)
 	*   |                *--------------*  |
 	*   |                |  |           |  |
-	*   |_____ x         |  |           |  |
+	*   |_____ x         |  | (-1,-1,1) |  |
 	*   /                |  |2(LLF)     |  |
-	*  /                 |  *-----------|--*3(RLF)
+	*  /                 |  *-----------|--*3(RLF) (1,-1,1)
 	*   -z               | /            | /
-	*                    |/             |/
-	*              6(LLB)*--------------*7(RLB)
+	*         (-1,-1,-1) |/             |/
+	*              6(LLB)*--------------*7(RLB) (1,-1,-1)
 	*
 	* */
 
@@ -130,7 +200,7 @@ namespace mc
 			sumVertexCount -= submitedVertices;
 		}
 
-		core::Vector<PosColorVertex> vertices;
+		core::Vector<PosNormalTangentTexcoordVertex> vertices;
 		core::Vector<uint16_t> indices;
 		bgfx::VertexBufferHandle vbh;
 		bgfx::IndexBufferHandle ibh;
@@ -139,7 +209,7 @@ namespace mc
 			uint8_t vBegin = 4 * (int)side;
 			for (auto i = vBegin; i < vBegin + 4; i++)
 			{
-				PosColorVertex clone = s_cubeVertices[s_cubeFaceIndices[i]];
+				PosNormalTangentTexcoordVertex clone = s_cubeVertices[i];
 				clone.m_x += 2 * x;
 				clone.m_y += 2 * y;
 				clone.m_z += 2 * z;
@@ -155,8 +225,15 @@ namespace mc
 
 
 		void createHandlers() {
+			/*calcTangents(vertices.data()
+				, sizeof(vertices[0])*vertices.size()
+				, PosNormalTangentTexcoordVertex::ms_decl
+				, indices.data()
+				, sizeof(indices[0])*indices.size()
+			);*/
+
 			auto vMem = bgfx::copy(vertices.data(), sizeof(vertices[0])*vertices.size());
-			vbh = bgfx::createVertexBuffer(vMem, PosColorVertex::ms_decl);
+			vbh = bgfx::createVertexBuffer(vMem, PosNormalTangentTexcoordVertex::ms_decl);
 			submitedVertices = vertices.size();
 			sumVertexCount += submitedVertices;
 			vertices.clear();

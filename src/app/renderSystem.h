@@ -28,70 +28,6 @@ namespace mc
 		return mtx;
 	}
 
-	//struct PosColorVertex
-	//{
-	//	float m_x;
-	//	float m_y;
-	//	float m_z;
-	//	uint32_t m_abgr;
-
-	//	static void init()
-	//	{
-	//		ms_decl
-	//			.begin()
-	//			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-	//			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-	//			.end();
-	//	};
-
-	//	static bgfx::VertexDecl ms_decl;
-	//};
-
-
-	//static PosColorVertex s_cubeVertices[] =
-	//{
-	//	{ -1.0f,  1.0f,  1.0f, 0xff000000 },
-	//{ 1.0f,  1.0f,  1.0f, 0xff0000ff },
-	//{ -1.0f, -1.0f,  1.0f, 0xff00ff00 },
-	//{ 1.0f, -1.0f,  1.0f, 0xff00ffff },
-	//{ -1.0f,  1.0f, -1.0f, 0xffff0000 },
-	//{ 1.0f,  1.0f, -1.0f, 0xffff00ff },
-	//{ -1.0f, -1.0f, -1.0f, 0xffffff00 },
-	//{ 1.0f, -1.0f, -1.0f, 0xffffffff },
-	//};
-
-	//static const uint16_t s_cubeTriList[] =
-	//{
-	//	0, 1, 2, // 0
-	//	1, 3, 2,
-	//	4, 6, 5, // 2
-	//	5, 6, 7,
-	//	0, 2, 4, // 4
-	//	4, 2, 6,
-	//	1, 5, 3, // 6
-	//	5, 7, 3,
-	//	0, 4, 1, // 8
-	//	4, 5, 1,
-	//	2, 3, 6, // 10
-	//	6, 3, 7,
-	//};
-
-	//static const uint16_t s_cubeTriStrip[] =
-	//{
-	//	0, 1, 2,
-	//	3,
-	//	7,
-	//	1,
-	//	5,
-	//	0,
-	//	4,
-	//	2,
-	//	6,
-	//	7,
-	//	4,
-	//	5,
-	//};
-
 	class ExampleCubes : public entry::AppI
 	{
 	public:
@@ -125,12 +61,16 @@ namespace mc
 			);
 
 			// Create vertex stream declaration.
-			PosColorVertex::init();
+			PosNormalTangentTexcoordVertex::init();
 
-
+			// Create texture sampler uniforms.
+			s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 
 			// Create program from shaders.
-			m_program = loadProgram("vs_cubes", "fs_cubes");
+			m_program = loadProgram("vs_bump", "fs_bump");
+			// Load diffuse texture.
+			m_textureColor = loadTexture("textures/dirt.dds");
+
 
 			m_timeOffset = bx::getHPCounter();
 
@@ -221,10 +161,17 @@ namespace mc
 					bgfx::setVertexBuffer(0, mesh->getVertexBufferHandle());
 					bgfx::setIndexBuffer(mesh->getIndexBufferHandle());
 
+					// Bind textures.
+					bgfx::setTexture(0, s_texColor, m_textureColor);
+
 					// Set render states.
 					bgfx::setState(0
-						| BGFX_STATE_DEFAULT
-						//	| BGFX_STATE_PT_TRISTRIP
+						| BGFX_STATE_RGB_WRITE
+						| BGFX_STATE_ALPHA_WRITE
+						| BGFX_STATE_DEPTH_WRITE
+						| BGFX_STATE_DEPTH_TEST_LESS
+						| BGFX_STATE_MSAA
+						| BGFX_STATE_CULL_CW
 					);
 
 					// Submit primitive for rendering to view 0.
@@ -271,7 +218,10 @@ namespace mc
 		uint32_t m_reset;
 		bgfx::VertexBufferHandle m_vbh;
 		bgfx::IndexBufferHandle m_ibh;
+		bgfx::UniformHandle s_texColor;
 		bgfx::ProgramHandle m_program;
+		bgfx::TextureHandle m_textureColor;
+
 		int64_t m_timeOffset;
 
 		CellSystem mCellSystem = MapGenerator{ 0 };

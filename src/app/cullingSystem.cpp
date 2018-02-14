@@ -55,8 +55,7 @@ namespace mc {
 			bool inside = true;
 			for (auto& plane : planes)
 			{
-				//glm::vec3 positive(chunk->getX()*offset, 0, chunk->getZ()*offset);
-				glm::vec3 positive(chunk->getX()*offset, cameraData.pos.y, chunk->getZ()*offset);
+				glm::vec3 positive(chunk->getX()*offset, 0, chunk->getZ()*offset);
 				if (plane.normal.x >= 0) positive.x += offset;
 				if (plane.normal.z >= 0) positive.z += offset; 
 
