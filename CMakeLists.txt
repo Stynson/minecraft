@@ -72,7 +72,7 @@ include( cmake/glm.cmake )
 #include( cmake/examples.cmake )
 include( cmake/minecraft.cmake )
 
-#COPY_RUNTIME_FILES( minecraft-app )
+COPY_RUNTIME_FILES( minecraft-app )
 
 if( BGFX_INSTALL )
 	# install bx
