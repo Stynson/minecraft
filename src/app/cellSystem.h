@@ -3,7 +3,7 @@
 #include "chunk.h"
 #include "mapGenerator.h"
 #include "cameraData.h"
-#include <map>
+#include <unordered_map>
 #include "core.h"
 #include <memory>
 
@@ -19,7 +19,7 @@ namespace mc {
 		core::Vector<Chunk*> getNearbyChunks(const CameraData& cameraData);
 
 	private:
-		core::Map<core::String, std::unique_ptr<Chunk>> mMap;
+		std::unordered_map<core::String, std::unique_ptr<Chunk>> mMap;
 		MapGenerator mGenerator;
 
 	};
