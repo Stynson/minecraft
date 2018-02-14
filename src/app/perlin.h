@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
+
 namespace mc
 {
 	class PerlinNoise

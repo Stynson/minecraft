@@ -1,6 +1,7 @@
 #include "mapGenerator.h"
 #include "core.h"
 #include <iostream>
+#include <cmath>
 
 namespace mc
 { 
