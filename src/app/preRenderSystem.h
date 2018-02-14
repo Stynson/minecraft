@@ -130,7 +130,6 @@ namespace mc
 			sumVertexCount -= submitedVertices;
 		}
 
-		// --- gabor -------
 		core::Vector<PosColorVertex> vertices;
 		core::Vector<uint16_t> indices;
 		bgfx::VertexBufferHandle vbh;
