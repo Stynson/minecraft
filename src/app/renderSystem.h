@@ -161,24 +161,8 @@ namespace mc
 
 				showExampleDialog(this);
 
-#if DEBUG == 1
-				ImGui::SetNextWindowPos(
-					ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-					, ImGuiCond_FirstUseEver
-				);
-				ImGui::SetNextWindowSize(
-					ImVec2(m_width / 5.0f, m_height / 2.0f)
-					, ImGuiCond_FirstUseEver
-				);
-				ImGui::Begin("Settings"
-					, NULL
-					, 0
-				);
-				ImGui::SliderFloat("Custom", &frustrumFarDistance, 0.0f, 100.0f);
-				if (ImGui::Button("F3", { 0, 20 }))
-					isDebugText = !isDebugText;
-				ImGui::End();
-#endif
+
+				setupDebugWindow();
 
 				imguiEndFrame();
 
@@ -200,7 +184,7 @@ namespace mc
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
-				if (isDebugText)
+				if (mDebugData.showChunkGizmos)
 				{
 					drawChunkGizmos();
 				}
@@ -211,9 +195,31 @@ namespace mc
 
 			return false;
 		}
-		void drawChunkGizmos()
-		{
 
+		void setupDebugWindow()
+		{
+			ImGui::SetNextWindowPos(
+				ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+				, ImGuiCond_FirstUseEver
+			);
+			ImGui::SetNextWindowSize(
+				ImVec2(m_width / 5.0f, m_height / 2.0f)
+				, ImGuiCond_FirstUseEver
+			);
+			ImGui::Begin("Settings"
+				, NULL
+				, 0
+			);
+			ImGui::SliderFloat("Custom", &frustrumFarDistance, 0.0f, 100.0f);
+			if (ImGui::Button("FPS View", { 0, 30 }))
+				mDebugData.isFirstPerson = !mDebugData.isFirstPerson;
+			if (ImGui::Button("Chunk WireFrame", { 0, 30 }))
+				mDebugData.showChunkGizmos = !mDebugData.showChunkGizmos;
+			ImGui::End();
+		}
+
+		void drawChunkGizmos()
+		{ 
 			ddPush();
 			Aabb aabb;
 			auto chunkOffset = mCameraData.chunkSize*mCameraData.blockSize;
@@ -226,12 +232,14 @@ namespace mc
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);
 			ddDraw(aabb);
-			ddPop(); 
+			ddPop();
 		}
 
 		void startRender()
 		{
-#if DEBUG == 1
+			ddBegin(0);
+			if (mDebugData.isFirstPerson)
+			{
 				glm::mat4 debugCameraView;
 				glm::vec3 zero(0.0f);
 				glm::vec3 eye(30.0f, 50.0f, 30.0f);
@@ -245,22 +253,21 @@ namespace mc
 				auto frustrumCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
 				auto mtxVp = frustrumCameraProj * mCameraData.view;
 
-				ddBegin(0);
 				ddDrawAxis(0.0f, 0.0f, 0.0f);
 				ddSetTransform(NULL);
 				ddDrawFrustum(&mtxVp[0][0]);
 				drawPoint(mCameraData);
-#else
-			auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
-			bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
-			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
-#endif
+			}
+			else
+			{
+				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
+				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+			}
 		}
 		void endRender()
 		{
-#if DEBUG == 1
 			ddEnd();
-#endif
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
 			bgfx::frame();
@@ -374,7 +381,12 @@ namespace mc
 
 		CameraData mCameraData;
 
-		bool isDebugText = true;
+		struct DebugData
+		{
+			bool isFirstPerson = true; 
+			bool showChunkGizmos = false;
+		};
+		DebugData mDebugData;
 
 #if DEBUG == 1
 		float frustrumFarDistance;
