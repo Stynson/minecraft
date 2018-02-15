@@ -4,8 +4,9 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace mc {
-	core::Vector<Chunk*> CullingSystem::getCulledChunks(const CameraData& cameraData)
+//#include <debugdraw/debugdraw.h>
+
+namespace mc {core::Vector<Chunk*> CullingSystem::getCulledChunks(const CameraData& cameraData)
 	{
 		auto nearbyChunks = mCellSystem.getNearbyChunks(cameraData);
 		auto culledChunks = core::Vector<Chunk*>();
@@ -17,16 +18,16 @@ namespace mc {
 		float farHeight = tanRatio * cameraData.farDist;
 		float farWidth = farHeight * cameraData.ratio;
 		glm::vec3 ray = glm::normalize(cameraData.lookAt - cameraData.pos);
-		glm::vec3 rightVector = glm::cross(cameraData.up, ray);
+		glm::vec3 rightVector = glm::normalize(glm::cross(ray, cameraData.up));
 
 		glm::vec3 farCenterPoint = cameraData.pos + ray * cameraData.farDist;
 		glm::vec3 nearCenterPoint = cameraData.pos + ray * cameraData.nearDist;
 
 		glm::vec3 rightPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
-		glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint - cameraData.pos));
+		glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint - cameraData.pos)) * -1.0f;
 
 		glm::vec3 leftPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f;
-		glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint - cameraData.pos)) * -1.0f;
+		glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint - cameraData.pos));
 
 		glm::vec3 upPlanePoint = nearCenterPoint + cameraData.up * nearHeight / 2.0f;
 		glm::vec3 upPlaneNormal = glm::cross(cameraData.up, glm::normalize(upPlanePoint - cameraData.pos));
@@ -40,14 +41,21 @@ namespace mc {
 		glm::vec3 farPlanePoint = farCenterPoint;
 		glm::vec3 farPlaneNormal = -ray;
 
-		std::array<Plane, 3> planes = {
-			Plane{rightPlaneNormal,rightPlanePoint}
-			, Plane{leftPlaneNormal,leftPlanePoint}
-			//, Plane{upPlaneNormal,upPlanePoint}
-			// , Plane{downPlaneNormal,downPlanePoint}
-			// , Plane{farPlaneNormal,farPlanePoint}
-			, Plane{nearPlaneNormal,nearPlanePoint}
-		};
+		core::Vector<Plane> planes;
+		planes.push_back(Plane{ nearPlaneNormal,nearPlanePoint });
+		planes.push_back(Plane{ farPlaneNormal,farPlanePoint });
+
+		planes.push_back(Plane{ leftPlaneNormal,rightPlanePoint });
+		planes.push_back(Plane{ rightPlaneNormal,rightPlanePoint });
+
+		//std::array<Plane, 3> planes = {
+		//	Plane{rightPlaneNormal,rightPlanePoint}
+		//	, Plane{leftPlaneNormal,leftPlanePoint}
+		//	//, Plane{upPlaneNormal,upPlanePoint}
+		//	// , Plane{downPlaneNormal,downPlanePoint}
+		//	// , Plane{farPlaneNormal,farPlanePoint}
+		//	, Plane{nearPlaneNormal,nearPlanePoint}
+		//};
 
 		int offset = cameraData.chunkSize*cameraData.blockSize;
 		for (auto& chunk : nearbyChunks)

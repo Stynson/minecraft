@@ -266,7 +266,7 @@ namespace mc
 			transform = glm::translate(transform, getChunkPosition());
 			bgfx::setTransform(&transform[0][0]);
 
-			bgfx::setVertexBuffer(0, vbh);
+			bgfx::setVertexBuffer(id, vbh);
 			bgfx::setIndexBuffer(ibh);
 
 			bgfx::setTexture(0, texUniform, texHandle);
