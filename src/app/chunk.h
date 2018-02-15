@@ -10,8 +10,8 @@ namespace mc {
 		AIR=0
 		, GRASS_DIRT
 		, COARSE_STONE
-		,a
-		,b
+		, TREE
+		, LEAF
 		,c
 		,d
 		,e
