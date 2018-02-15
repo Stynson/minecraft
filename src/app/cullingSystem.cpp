@@ -4,8 +4,6 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#include <debugdraw/debugdraw.h>
-
 namespace mc {core::Vector<Chunk*> CullingSystem::getCulledChunks(const CameraData& cameraData)
 	{
 		auto nearbyChunks = mCellSystem.getNearbyChunks(cameraData);

@@ -16,6 +16,8 @@
 
 #include <debugdraw/debugdraw.h>
 
+#define DEBUG 1
+
 namespace mc
 {
 	inline glm::tmat4x4<float, glm::defaultp> perspective(float fovy, float aspect, float zNear, float zFar)
@@ -87,7 +89,7 @@ namespace mc
 				clone.m_z += 2;
 				skyboxVert.push_back(clone);
 			}
-			for (auto i = 0; i < 6; i ++)
+			for (auto i = 0; i < 6; i++)
 			{
 				skyboxIndices.push_back(i * 4 + 0);
 				skyboxIndices.push_back(i * 4 + 1);
@@ -110,7 +112,7 @@ namespace mc
 
 			imguiCreate();
 
-			slider = 236.0f;
+			frustrumFarDistance = 200.0f;
 
 			cameraCreate();
 
@@ -158,6 +160,7 @@ namespace mc
 
 				showExampleDialog(this);
 
+#if DEBUG == 1
 				ImGui::SetNextWindowPos(
 					ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
 					, ImGuiCond_FirstUseEver
@@ -170,66 +173,21 @@ namespace mc
 					, NULL
 					, 0
 				);
-				ImGui::SliderFloat("Custom", &slider, 0.0f, 1000.0f);
+				ImGui::SliderFloat("Custom", &frustrumFarDistance, 0.0f, 100.0f);
 				ImGui::End();
-
-
+#endif
 
 				imguiEndFrame();
 
 				float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
 
 				updateCamera(deltaTime);
-
-				//auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
-				//bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
-				//bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
-				//bgfx::setViewTransform(1, &mCameraData.view[0][0], &proj[0][0]);
-				//bgfx::setViewRect(1, 0, 0, uint16_t(m_width), uint16_t(m_height));
-
 				// This dummy draw call is here to make sure that view 0 is cleared
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				float view[16];
-				//cameraGetViewMtx(view);
-				float zero[3] = {};
-				//float eye[3];
-				//cameraGetPosition(eye);
-				float eye[] = { 30.0f, 50.0f, 30.0f };
-				bx::mtxLookAt(view, eye, zero);
-
-				float proj[16];
-				bx::mtxProj(proj, 60.0f, float(m_width) / float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-
-				bgfx::setViewTransform(0, view, proj);
-				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
-
-
-
-				float mtxVp[16];
-				bx::mtxMul(mtxVp, view, proj);
-
-				float mtxInvVp[16];
-				bx::mtxInverse(mtxInvVp, mtxVp);
-
-				//float eye2[] = { 0.0f, 10.0f, 0.0f };
-				//float eye[3];
-				//cameraGetPosition(eye);
-				//bx::mtxLookAt(view, eye2, zero);
-				cameraGetViewMtx(view);
-				bx::mtxProj(proj, 45.0f, float(m_width) / float(m_height), 1.0f, 15.0f, bgfx::getCaps()->homogeneousDepth);
-				bx::mtxMul(mtxVp, view, proj);
-
-				ddBegin(0);
-				ddDrawAxis(0.0f, 0.0f, 0.0f);
-
-				ddSetTransform(NULL);
-				ddDrawFrustum(mtxVp);
-
-				drawPoint(mCameraData);
-
-				//renderSkybox();
+				startRender();
+				renderSkybox();
 
 				auto meshes = mPreRenderSystem.getMeshes(mCameraData);
 				auto chunkOffset = mCameraData.blockSize * mCameraData.chunkSize;
@@ -239,15 +197,52 @@ namespace mc
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
-				ddEnd();
-				// Advance to next frame. Rendering thread will be kicked to
-				// process submitted rendering primitives.
-				bgfx::frame();
-
+				endRender();
 				return true;
 			}
 
 			return false;
+		}
+
+		void startRender()
+		{
+			if (DEBUG)
+			{
+				glm::mat4 debugCameraView;
+				glm::vec3 zero(0.0f);
+				glm::vec3 eye(30.0f, 50.0f, 30.0f);
+				bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
+				auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+
+				bgfx::setViewTransform(0, &debugCameraView[0][0], &debugCameraProj[0][0]);
+				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+
+				cameraGetViewMtx(&mCameraData.view[0][0]);
+				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
+				auto mtxVp = proj * mCameraData.view;
+
+				ddBegin(0);
+				ddDrawAxis(0.0f, 0.0f, 0.0f);
+				ddSetTransform(NULL);
+				ddDrawFrustum(&mtxVp[0][0]);
+				drawPoint(mCameraData);
+			}
+			else
+			{
+				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
+				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+			}
+		}
+		void endRender()
+		{
+			if (DEBUG)
+			{
+				ddEnd();
+			}
+			// Advance to next frame. Rendering thread will be kicked to
+			// process submitted rendering primitives.
+			bgfx::frame();
 		}
 
 		void drawPoint(const CameraData& cameraData) {
@@ -257,48 +252,39 @@ namespace mc
 			float farHeight = tanRatio * cameraData.farDist;
 			float farWidth = farHeight * cameraData.ratio;
 			glm::vec3 ray = glm::normalize(cameraData.lookAt - cameraData.pos);
-			glm::vec3 rightVector = glm::cross(ray, cameraData.up);
+			glm::vec3 rightVector = glm::normalize(glm::cross(ray, cameraData.up));
 
 			glm::vec3 farCenterPoint = cameraData.pos + ray * cameraData.farDist;
 			glm::vec3 nearCenterPoint = cameraData.pos + ray * cameraData.nearDist;
 
 			glm::vec3 rightPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
-			glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint - cameraData.pos));
-
-			glm::vec3 leftPlanePointNear = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
-			glm::vec3 leftPlanePointFar = glm::normalize(farCenterPoint + rightVector) * farWidth / 2.0f * -1.0f;
-			glm::vec3 leftPlaneNormal = glm::cross(glm::normalize(leftPlanePointNear - leftPlanePointFar), cameraData.up);
+			glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint - cameraData.pos)) * -1.0f;
 
 			glm::vec3 leftPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f;
-			//ddPush();
-			//	Sphere sphere = { { nearCenterPoint[0], nearCenterPoint[1], nearCenterPoint[2] }, 1.0f };
-			//	ddSetColor(0xfff0c0ff);
-			//	ddSetWireframe(true);
-			//	ddSetLod(3);
-			//	ddDraw(sphere);
-			//ddPop();
+			glm::vec3 leftPlaneNormal = glm::cross(cameraData.up, glm::normalize(leftPlanePoint - cameraData.pos));
+
 			ddPush();
-				Sphere sphere = { { leftPlanePoint[0], leftPlanePoint[1], leftPlanePoint[2] }, 0.1f };
-				ddSetColor(0xfff0c0ff);
-				ddSetWireframe(false);
-				ddDraw(sphere);
+			Sphere sphere = { { leftPlanePoint[0], leftPlanePoint[1], leftPlanePoint[2] }, 0.1f };
+			ddSetColor(0xfff0c0ff);
+			ddSetWireframe(false);
+			ddDraw(sphere);
 
-				Sphere sphere2 = { { rightPlanePoint[0], rightPlanePoint[1], rightPlanePoint[2] }, 0.1f };
-				ddSetColor(0xfff0c0ff);
-				ddSetWireframe(false);
-				ddDraw(sphere2);
+			Sphere sphere2 = { { rightPlanePoint[0], rightPlanePoint[1], rightPlanePoint[2] }, 0.1f };
+			ddSetColor(0xfff0c0ff);
+			ddSetWireframe(false);
+			ddDraw(sphere2);
 
-				Sphere sphere3 = { { nearCenterPoint[0], nearCenterPoint[1], nearCenterPoint[2] }, 0.1f };
-				ddSetColor(0xfff0c0ff);
-				ddSetWireframe(false);
-				ddDraw(sphere3);
+			Sphere sphere3 = { { nearCenterPoint[0], nearCenterPoint[1], nearCenterPoint[2] }, 0.1f };
+			ddSetColor(0xfff0c0ff);
+			ddSetWireframe(false);
+			ddDraw(sphere3);
 			ddPop();
 		}
 
 		void renderSkybox() {
 			auto transform = glm::mat4(1.0f);
 			transform = glm::translate(transform, mCameraData.pos);
-			transform = glm::scale(transform, glm::vec3(slider));
+			transform = glm::scale(transform, glm::vec3(mCameraData.farDist*1.5f));
 			transform = glm::translate(transform, glm::vec3(-2.0f));
 			bgfx::setTransform(&transform[0][0]);
 
@@ -367,7 +353,9 @@ namespace mc
 
 		CameraData mCameraData;
 
-		float slider;
+#if DEBUG == 1
+		float frustrumFarDistance;
+#endif
 	};
 
 
