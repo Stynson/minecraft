@@ -16,7 +16,7 @@
 
 #include <debugdraw/debugdraw.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 namespace mc
 {
@@ -175,6 +175,8 @@ namespace mc
 					, 0
 				);
 				ImGui::SliderFloat("Custom", &frustrumFarDistance, 0.0f, 100.0f);
+				if (ImGui::Button("F3", { 0, 20 }))
+					isDebugText = !isDebugText;
 				ImGui::End();
 #endif
 
@@ -198,44 +200,66 @@ namespace mc
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
+				if (isDebugText)
+				{
+					drawChunkGizmos();
+				}
+
 				endRender();
 				return true;
 			}
 
 			return false;
 		}
+		void drawChunkGizmos()
+		{
+
+			ddPush();
+			Aabb aabb;
+			auto chunkOffset = mCameraData.chunkSize*mCameraData.blockSize;
+			aabb.m_min[0] = 0;
+			aabb.m_min[1] = 0;
+			aabb.m_min[2] = 0;
+			aabb.m_max[0] = chunkOffset;
+			aabb.m_max[1] = chunkOffset;
+			aabb.m_max[2] = chunkOffset;
+			ddSetColor(0xfff0c0ff);
+			ddSetWireframe(true);
+			ddDraw(aabb);
+			ddPop(); 
+		}
 
 		void startRender()
 		{
-#if DEBUG == 1
-				glm::mat4 debugCameraView;
-				glm::vec3 zero(0.0f);
-				glm::vec3 eye(30.0f, 50.0f, 30.0f);
-				bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
-				auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+#if DEBUG
+			glm::mat4 debugCameraView;
+			glm::vec3 zero(0.0f);
+			glm::vec3 eye(30.0f, 50.0f, 30.0f);
+			bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
+			auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 
-				bgfx::setViewTransform(0, &debugCameraView[0][0], &debugCameraProj[0][0]);
-				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+			bgfx::setViewTransform(0, &debugCameraView[0][0], &debugCameraProj[0][0]);
+			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
-				cameraGetViewMtx(&mCameraData.view[0][0]);
-				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
-				auto mtxVp = proj * mCameraData.view;
+			cameraGetViewMtx(&mCameraData.view[0][0]);
+			auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
+			auto mtxVp = proj * mCameraData.view;
 
-				ddBegin(0);
-				ddDrawAxis(0.0f, 0.0f, 0.0f);
-				ddSetTransform(NULL);
-				ddDrawFrustum(&mtxVp[0][0]);
-				drawPoint(mCameraData);
+			ddBegin(0);
+			ddDrawAxis(0.0f, 0.0f, 0.0f);
+			ddSetTransform(NULL);
+			ddDrawFrustum(&mtxVp[0][0]);
+			drawPoint(mCameraData);
 #else
-				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
-				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
-				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+			auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+			bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
+			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
 #endif
 		}
 		void endRender()
 		{
 #if DEBUG == 1
-				ddEnd();
+			ddEnd();
 #endif
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -252,7 +276,7 @@ namespace mc
 			glm::vec3 rightVector = glm::normalize(glm::cross(ray, cameraData.up));
 
 			glm::vec3 farCenterPoint = cameraData.pos + ray * cameraData.farDist;
-			glm::vec3 nearCenterPoint = cameraData.pos + ray * cameraData.nearDist;
+			glm::vec3 nearCenterPoint = cameraData.pos + ray * cameraData.nearDist / 2.0f;
 
 			glm::vec3 rightPlanePoint = nearCenterPoint + rightVector * nearWidth / 2.0f * -1.0f;
 			glm::vec3 rightPlaneNormal = glm::cross(cameraData.up, glm::normalize(rightPlanePoint - cameraData.pos)) * -1.0f;
@@ -349,6 +373,8 @@ namespace mc
 		PreRenderSystem mPreRenderSystem = mCullingSystem;
 
 		CameraData mCameraData;
+
+		bool isDebugText = true;
 
 #if DEBUG == 1
 		float frustrumFarDistance;
