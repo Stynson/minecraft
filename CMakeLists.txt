@@ -42,17 +42,14 @@ if( NOT APP_DIR )
 	set( APP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/app" CACHE STRING "Location of app." )
 endif()
 
-set( APP_RUNTIME_DIR "${APP_DIR}/runtime" CACHE STRING "Location of runtime files." )
+#set( APP_RUNTIME_DIR "${TARGET_FILE_DIR}/runtime" CACHE STRING "Location of runtime files." )
+#set( APP_RUNTIME_DIR "${CMAKE_BINARY_DIR}" CACHE STRING "Location of runtime files." )
+set( APP_RUNTIME_DIR "${PROJECT_BINARY_DIR}" CACHE STRING "Location of runtime files." )
 set( APP_COMMON_DIR "${APP_DIR}/common" CACHE STRING "Location of common files." )
 set( GLM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm" CACHE STRING "Location of glm library." )
 
-MACRO(COPY_RUNTIME_FILES name)
-      # SDL_Mixer
-      add_custom_command(TARGET ${name} POST_BUILD   
-          COMMAND ${CMAKE_COMMAND} -E copy_directory  
-              "${APP_RUNTIME_DIR}" # <--this is in-file
-              $<TARGET_FILE_DIR:${name}>) # <--this is out-file path
-ENDMACRO()
+MESSAGE( ${APP_RUNTIME_DIR} )
+MESSAGE( ${PROJECT_BINARY_DIR} )
 
 if( BGFX_USE_OVR )
 	include( cmake/ovr.cmake )
@@ -72,7 +69,7 @@ include( cmake/glm.cmake )
 #include( cmake/examples.cmake )
 include( cmake/minecraft.cmake )
 
-COPY_RUNTIME_FILES( minecraft-app )
+
 
 if( BGFX_INSTALL )
 	# install bx

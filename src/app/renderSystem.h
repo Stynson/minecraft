@@ -72,7 +72,7 @@ namespace mc
 			s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 
 			// Create program from shaders.
-			m_program = loadProgram("vs_bump", "fs_bump");
+			m_program = loadProgram("vs_cubes", "fs_cubes");
 			// Load diffuse texture.
 			m_textureColor = loadTexture("textures/terrain.png");
 
@@ -231,25 +231,25 @@ namespace mc
 
 		void startRender()
 		{
-#if DEBUG
-			glm::mat4 debugCameraView;
-			glm::vec3 zero(0.0f);
-			glm::vec3 eye(30.0f, 50.0f, 30.0f);
-			bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
-			auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
+#if DEBUG == 1
+				glm::mat4 debugCameraView;
+				glm::vec3 zero(0.0f);
+				glm::vec3 eye(30.0f, 50.0f, 30.0f);
+				bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
+				auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 
-			bgfx::setViewTransform(0, &debugCameraView[0][0], &debugCameraProj[0][0]);
-			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+				bgfx::setViewTransform(0, &debugCameraView[0][0], &debugCameraProj[0][0]);
+				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
-			cameraGetViewMtx(&mCameraData.view[0][0]);
-			auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
-			auto mtxVp = proj * mCameraData.view;
+				cameraGetViewMtx(&mCameraData.view[0][0]);
+				auto frustrumCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
+				auto mtxVp = frustrumCameraProj * mCameraData.view;
 
-			ddBegin(0);
-			ddDrawAxis(0.0f, 0.0f, 0.0f);
-			ddSetTransform(NULL);
-			ddDrawFrustum(&mtxVp[0][0]);
-			drawPoint(mCameraData);
+				ddBegin(0);
+				ddDrawAxis(0.0f, 0.0f, 0.0f);
+				ddSetTransform(NULL);
+				ddDrawFrustum(&mtxVp[0][0]);
+				drawPoint(mCameraData);
 #else
 			auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 			bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
@@ -344,7 +344,7 @@ namespace mc
 			cameraGetAt(at);
 			mCameraData.lookAt = glm::vec3(at[0], at[1], at[2]);
 
-			mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
+			//mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
 
 			mCameraData.ratio = (float)m_width / (float)m_height;
 			mCameraData.farDist = (mCameraData.viewDistance - 1) * mCameraData.chunkSize * mCameraData.blockSize;

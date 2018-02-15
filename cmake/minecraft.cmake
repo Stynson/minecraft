@@ -69,7 +69,7 @@ function( add_bgfx_shader FILE FOLDER )
 			get_filename_component( OUT_DIR ${${OUT}_OUTPUT} DIRECTORY )
 			file( MAKE_DIRECTORY ${OUT_DIR} )
 		endforeach()
-		file( RELATIVE_PATH PRINT_NAME ${BGFX_DIR}/examples ${FILE} )
+		file( RELATIVE_PATH PRINT_NAME ${APP_DIR}/${ARG_NAME} ${FILE} )
 		add_custom_command(
 			MAIN_DEPENDENCY
 			${FILE}
