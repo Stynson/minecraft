@@ -15,6 +15,7 @@ namespace mc
 		{};
 		std::unique_ptr<Chunk> generate(int x, int z) const;
 	private:
+		void generateTrees(Chunk& chunk) const;
 		int mSeed;
 		PerlinNoise mPerlinNoise;
 	};
