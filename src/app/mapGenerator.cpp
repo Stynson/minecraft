@@ -23,7 +23,13 @@ namespace mc
 				chunk->setBlockType(BlockType::GRASS_DIRT, i, height, j);
 			}
 		}
-		if (rand() % 3 == 1)
+		generateTrees(*chunk);
+		return std::move(chunk);
+	}
+
+	void MapGenerator::generateTrees(Chunk& chunk) const
+	{
+		if (rand() % 1 == 0)
 		{
 			int i = rand() % Chunk::WIDTH;
 			int j = rand() % Chunk::WIDTH;
@@ -33,27 +39,30 @@ namespace mc
 				i = 5;
 				j = 5;
 			}
-			for (int z = 0; chunk->getBlock(i, z, j).type != BlockType::AIR; z++)
+			double height;
+			for (int z = 0; chunk.getBlock(i, z, j).type != BlockType::AIR; z++)
 			{
 				height = z;
 			}
 
 			for (int z = height; z < height + 5; z++)
 			{
-				chunk->setBlockType(BlockType::TREE, i, z, j);
+				chunk.setBlockType(BlockType::TREE, i, z, j);
 			}
-			for (; height + 5 < 15; height++)
+			int decrease = 3;
+			int increase = 4;
+			for (; height + 5 < Chunk::HEIGHT; height++)
 			{
-				for (int z = i-2 ; z < i+3; z++)
+				for (int z = i - decrease; z < i + decrease + 1; z++)
 				{
-					for (int q = j-2; q < j+3; q++)
+					for (int q = j - decrease; q < j + decrease + 1; q++)
 					{
-						chunk->setBlockType(BlockType::LEAF, z, height + 5, q);
+						chunk.setBlockType(BlockType::LEAF, z, height + 5, q);
 					}
 				}
+				decrease--;
 			}
 		}
-	
-		return std::move(chunk);
+
 	}
 }
