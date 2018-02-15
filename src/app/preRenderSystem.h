@@ -24,46 +24,6 @@
 
 namespace mc
 {
-	/*struct PosColorVertex
-	{
-	float m_x;
-	float m_y;
-	float m_z;
-	uint32_t m_abgr;
-
-	static void init()
-	{
-	ms_decl
-	.begin()
-	.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-	.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-	.end();
-	};
-
-	static bgfx::VertexDecl ms_decl;
-	};
-	static PosColorVertex s_cubeVertices[8] =
-	{
-	{ -1.0f,  1.0f,  1.0f, 0xff000000 }
-	,{ 1.0f,  1.0f,  1.0f, 0xff0000ff }
-	,{ -1.0f, -1.0f,  1.0f, 0xff00ff00 }
-	,{ 1.0f, -1.0f,  1.0f, 0xff00ffff }
-	,{ -1.0f,  1.0f, -1.0f, 0xffff0000 }
-	,{ 1.0f,  1.0f, -1.0f, 0xffff00ff }
-	,{ -1.0f, -1.0f, -1.0f, 0xffffff00 }
-	,{ 1.0f, -1.0f, -1.0f, 0xffffffff }
-	};
-
-	static const uint16_t s_cubeFaceIndices[24] =
-	{
-	0, 1, 2, 3
-	,4, 6, 5, 7
-	,0, 2, 4, 6
-	,1, 5, 3, 7
-	,0, 4, 1, 5
-	,2, 3, 6, 7
-	};*/
-
 	struct PosNormalTangentTexcoordVertex
 	{
 		float m_x;
@@ -88,37 +48,42 @@ namespace mc
 		static bgfx::VertexDecl ms_decl;
 	};
 
+	const int atlasIndex = 2048;
 	static PosNormalTangentTexcoordVertex s_cubeVertices[24] =
 	{
 		// BACK
 		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0 },
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0 },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0x7fff },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0x7fff, 0x7fff },
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  atlasIndex, 0 },
+		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, atlasIndex },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  atlasIndex, atlasIndex },
 		// FRONT
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0 },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, 0 },
 		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0x7fff, 0x7fff },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0x7fff },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, atlasIndex },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, atlasIndex },
 		// LEFT
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0x7fff },
-		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0x7fff, 0 },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0x7fff },
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, atlasIndex },
+		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, 0 },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, atlasIndex },
 		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
 		// RIGHT
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0 },
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0x7fff, 0x7fff },
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, 0 },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, atlasIndex },
 		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0x7fff },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, atlasIndex },
 		// UP
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0 },
+		//{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
+		//{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
+		//{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		//{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, atlasIndex },
+		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
 		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0x7fff, 0x7fff },
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0x7fff },
+		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, atlasIndex},
 		// DOWN
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0x7fff },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0x7fff },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0x7fff, 0 },
+		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, atlasIndex },
+		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  atlasIndex, 0 },
 		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
 	};
 
@@ -206,7 +171,7 @@ namespace mc
 		bgfx::VertexBufferHandle vbh;
 		bgfx::IndexBufferHandle ibh;
 
-		void addVertices(Side side, int x, int y, int z) {
+		void addVertices(Side side, int x, int y, int z, int atlasIndex) {
 			uint8_t vBegin = 4 * (int)side;
 			for (auto i = vBegin; i < vBegin + 4; i++)
 			{
@@ -214,6 +179,8 @@ namespace mc
 				clone.m_x += 2 * x;
 				clone.m_y += 2 * y;
 				clone.m_z += 2 * z;
+				clone.m_u += atlasIndex;
+				clone.m_v += atlasIndex;
 				vertices.push_back(clone);
 			}
 			indices.push_back(vertices.size() + 0);
@@ -240,7 +207,7 @@ namespace mc
 			vertices.clear();
 
 			auto iMem = bgfx::copy(indices.data(), sizeof(indices[0])*indices.size());
-			ibh = bgfx::createIndexBuffer(iMem,BGFX_BUFFER_INDEX32);
+			ibh = bgfx::createIndexBuffer(iMem, BGFX_BUFFER_INDEX32);
 			indices.clear();
 		}
 		size_t submitedVertices = 0;
@@ -328,6 +295,7 @@ namespace mc
 	private:
 		std::unique_ptr<Mesh> bakeMesh(Chunk* chunk)
 		{
+			int atlasIndex = 2048;
 			auto m = std::make_unique<Mesh>();
 			for (auto y = 0; y < Chunk::HEIGHT; y++)
 			{
@@ -335,33 +303,34 @@ namespace mc
 				{
 					for (auto x = 0; x < Chunk::WIDTH; x++)
 					{
+						auto block = chunk->getBlock(x, y, z);
 						if (!chunk->isBlockType(BlockType::AIR, x, y, z))
 						{
 							if (x == 0 || chunk->isBlockType(BlockType::AIR, x - 1, y, z))
 							{
-								m->addVertices(Side::LEFT, x, y, z);
+								m->addVertices(Side::LEFT, x, y, z, atlasIndex*((int)block.type-1));
 							}
 							if (x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
 							{
-								m->addVertices(Side::RIGHT, x, y, z);
+								m->addVertices(Side::RIGHT, x, y, z, atlasIndex*((int)block.type-1));
 							}
 
 							if (y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
 							{
-								m->addVertices(Side::DOWN, x, y, z);
+								m->addVertices(Side::DOWN, x, y, z, atlasIndex*((int)block.type-1));
 							}
 							if (y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
 							{
-								m->addVertices(Side::UP, x, y, z);
+								m->addVertices(Side::UP, x, y, z, atlasIndex*((int)block.type-1));
 							}
 
 							if (z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
 							{
-								m->addVertices(Side::FRONT, x, y, z);
+								m->addVertices(Side::FRONT, x, y, z, atlasIndex*((int)block.type-1));
 							}
 							if (z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
 							{
-								m->addVertices(Side::BACK, x, y, z);
+								m->addVertices(Side::BACK, x, y, z, atlasIndex*((int)block.type-1));
 							}
 						}
 					}

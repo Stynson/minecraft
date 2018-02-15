@@ -297,9 +297,15 @@ namespace mc
 
 		void renderSkybox() {
 			auto transform = glm::mat4(1.0f);
+<<<<<<< HEAD
 			transform = glm::translate(transform, mCameraData.pos);
 			transform = glm::scale(transform, glm::vec3(slider));
 			transform = glm::translate(transform, glm::vec3(-2.0f));
+=======
+			transform = glm::translate(transform, mCameraData.pos - glm::vec3(2.0f, 2.0f, 2.0f));
+			transform = glm::translate(transform, glm::vec3(-100.0f));
+			transform = glm::scale(transform, glm::vec3(75.0f));
+>>>>>>> 1b82725e4553866add6eee2bc91a862b42da37b7
 			bgfx::setTransform(&transform[0][0]);
 
 			bgfx::setVertexBuffer(0, skyboxVbh);
