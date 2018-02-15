@@ -227,7 +227,7 @@ namespace mc
 			aabb.m_min[1] = 0;
 			aabb.m_min[2] = 0;
 			aabb.m_max[0] = chunkOffset;
-			aabb.m_max[1] = chunkOffset;
+			aabb.m_max[1] = chunkOffset*2;
 			aabb.m_max[2] = chunkOffset;
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);

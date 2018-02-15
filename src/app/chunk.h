@@ -39,7 +39,7 @@ namespace mc {
 	{
 	public:
 		static const uint8_t WIDTH = 16;
-		static const uint16_t HEIGHT = 16;
+		static const uint16_t HEIGHT = 32;
 
 		Chunk() = default;
 		Chunk(int x, int z) : mX(x), mZ(z) {};
