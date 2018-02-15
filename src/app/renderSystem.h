@@ -16,7 +16,7 @@
 
 #include <debugdraw/debugdraw.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 namespace mc
 {
@@ -112,8 +112,9 @@ namespace mc
 
 			imguiCreate();
 
+#if DEBUG == 1
 			frustrumFarDistance = 200.0f;
-
+#endif
 			cameraCreate();
 
 			const float initialPos[3] = { 5.0f, 20.0, 0.0f };
@@ -206,8 +207,7 @@ namespace mc
 
 		void startRender()
 		{
-			if (DEBUG)
-			{
+#if DEBUG == 1
 				glm::mat4 debugCameraView;
 				glm::vec3 zero(0.0f);
 				glm::vec3 eye(30.0f, 50.0f, 30.0f);
@@ -226,20 +226,17 @@ namespace mc
 				ddSetTransform(NULL);
 				ddDrawFrustum(&mtxVp[0][0]);
 				drawPoint(mCameraData);
-			}
-			else
-			{
+#else
 				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
-			}
+#endif
 		}
 		void endRender()
 		{
-			if (DEBUG)
-			{
+#if DEBUG == 1
 				ddEnd();
-			}
+#endif
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
 			bgfx::frame();
@@ -284,7 +281,7 @@ namespace mc
 		void renderSkybox() {
 			auto transform = glm::mat4(1.0f);
 			transform = glm::translate(transform, mCameraData.pos);
-			transform = glm::scale(transform, glm::vec3(mCameraData.farDist*1.5f));
+			transform = glm::scale(transform, glm::vec3(mCameraData.farDist*0.6f));
 			transform = glm::translate(transform, glm::vec3(-2.0f));
 			bgfx::setTransform(&transform[0][0]);
 
@@ -323,7 +320,7 @@ namespace mc
 			cameraGetAt(at);
 			mCameraData.lookAt = glm::vec3(at[0], at[1], at[2]);
 
-			//mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
+			mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
 
 			mCameraData.ratio = (float)m_width / (float)m_height;
 			mCameraData.farDist = (mCameraData.viewDistance - 1) * mCameraData.chunkSize * mCameraData.blockSize;
