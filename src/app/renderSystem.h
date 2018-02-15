@@ -16,7 +16,7 @@
 
 #include <debugdraw/debugdraw.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 namespace mc
 {
@@ -72,7 +72,7 @@ namespace mc
 			s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 
 			// Create program from shaders.
-			m_program = loadProgram("vs_bump", "fs_bump");
+			m_program = loadProgram("vs_cubes", "fs_cubes");
 			// Load diffuse texture.
 			m_textureColor = loadTexture("textures/terrain.png");
 
@@ -218,8 +218,8 @@ namespace mc
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
 				cameraGetViewMtx(&mCameraData.view[0][0]);
-				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
-				auto mtxVp = proj * mCameraData.view;
+				auto frustrumCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, frustrumFarDistance);
+				auto mtxVp = frustrumCameraProj * mCameraData.view;
 
 				ddBegin(0);
 				ddDrawAxis(0.0f, 0.0f, 0.0f);
@@ -320,7 +320,7 @@ namespace mc
 			cameraGetAt(at);
 			mCameraData.lookAt = glm::vec3(at[0], at[1], at[2]);
 
-			mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
+			//mCameraData.up = glm::vec3(mCameraData.view[1][2], mCameraData.view[2][2], mCameraData.view[3][2]);
 
 			mCameraData.ratio = (float)m_width / (float)m_height;
 			mCameraData.farDist = (mCameraData.viewDistance - 1) * mCameraData.chunkSize * mCameraData.blockSize;
