@@ -69,7 +69,7 @@ namespace mc
 			// Create program from shaders.
 			m_program = loadProgram("vs_bump", "fs_bump");
 			// Load diffuse texture.
-			m_textureColor = loadTexture("textures/dirt.dds");
+			m_textureColor = loadTexture("textures/terrain.png");
 
 			//m_skybox = loadTexture("textures/fieldstone-rgba.dds");
 			m_skybox = loadTexture("textures/skybox.dds");
@@ -188,8 +188,8 @@ namespace mc
 		void renderSkybox() {
 			auto transform = glm::mat4(1.0f);
 			transform = glm::translate(transform, mCameraData.pos - glm::vec3(2.0f, 2.0f, 2.0f));
-			transform = glm::translate(transform, glm::vec3(-75.0f));
-			transform = glm::scale(transform, glm::vec3(50.0f));
+			transform = glm::translate(transform, glm::vec3(-100.0f));
+			transform = glm::scale(transform, glm::vec3(75.0f));
 			bgfx::setTransform(&transform[0][0]);
 
 			bgfx::setVertexBuffer(0, skyboxVbh);

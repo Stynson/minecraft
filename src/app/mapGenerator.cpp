@@ -15,10 +15,11 @@ namespace mc
 				double height = mPerlinNoise.noise(chunk->getX() + i, chunk->getZ() + j, -0.2);
 				height -= floor(height);
 				height *= Chunk::HEIGHT;
-				for (auto y = 0; y < height; y++)
+				for (auto y = 0; y < height - 1; y++)
 				{
 					chunk->setBlockType(BlockType::DIRT, i, y, j);
 				}
+				chunk->setBlockType(BlockType::GRASS_DIRT, i, height, j);
 			}
 		}
 		return std::move(chunk);
