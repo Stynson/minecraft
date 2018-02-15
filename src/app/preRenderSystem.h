@@ -144,7 +144,8 @@ namespace mc
 		, DOWN
 	};
 
-
+	static uint16_t textJump = 2048;
+	static uint8_t blockPerRow = 16;
 
 	struct Mesh
 	{
@@ -171,7 +172,7 @@ namespace mc
 		bgfx::VertexBufferHandle vbh;
 		bgfx::IndexBufferHandle ibh;
 
-		void addVertices(Side side, int x, int y, int z, int atlasIndex) {
+		void addVertices(Side side, int x, int y, int z, int blockIndex) {
 			uint8_t vBegin = 4 * (int)side;
 			for (auto i = vBegin; i < vBegin + 4; i++)
 			{
@@ -179,8 +180,8 @@ namespace mc
 				clone.m_x += 2 * x;
 				clone.m_y += 2 * y;
 				clone.m_z += 2 * z;
-				clone.m_u += atlasIndex;
-				clone.m_v += atlasIndex;
+				clone.m_u += blockIndex % blockPerRow * 2048;
+				clone.m_v += blockIndex / blockPerRow * 2048;
 				vertices.push_back(clone);
 			}
 			indices.push_back(vertices.size() + 0);
@@ -295,7 +296,6 @@ namespace mc
 	private:
 		std::unique_ptr<Mesh> bakeMesh(Chunk* chunk)
 		{
-			int atlasIndex = 2048;
 			auto m = std::make_unique<Mesh>();
 			for (auto y = 0; y < Chunk::HEIGHT; y++)
 			{
@@ -308,29 +308,29 @@ namespace mc
 						{
 							if (x == 0 || chunk->isBlockType(BlockType::AIR, x - 1, y, z))
 							{
-								m->addVertices(Side::LEFT, x, y, z, atlasIndex*((int)block.type-1));
+								m->addVertices(Side::LEFT, x, y, z, (int)block.type-1);
 							}
 							if (x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
 							{
-								m->addVertices(Side::RIGHT, x, y, z, atlasIndex*((int)block.type-1));
+								m->addVertices(Side::RIGHT, x, y, z, (int)block.type-1);
 							}
 
 							if (y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
 							{
-								m->addVertices(Side::DOWN, x, y, z, atlasIndex*((int)block.type-1));
+								m->addVertices(Side::DOWN, x, y, z, (int)block.type-1);
 							}
 							if (y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
 							{
-								m->addVertices(Side::UP, x, y, z, atlasIndex*((int)block.type-1));
+								m->addVertices(Side::UP, x, y, z, (int)block.type-1);
 							}
 
 							if (z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
 							{
-								m->addVertices(Side::FRONT, x, y, z, atlasIndex*((int)block.type-1));
+								m->addVertices(Side::FRONT, x, y, z, (int)block.type-1);
 							}
 							if (z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
 							{
-								m->addVertices(Side::BACK, x, y, z, atlasIndex*((int)block.type-1));
+								m->addVertices(Side::BACK, x, y, z, (int)block.type-1);
 							}
 						}
 					}

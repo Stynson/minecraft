@@ -48,9 +48,6 @@ set( APP_RUNTIME_DIR "${PROJECT_BINARY_DIR}" CACHE STRING "Location of runtime f
 set( APP_COMMON_DIR "${APP_DIR}/common" CACHE STRING "Location of common files." )
 set( GLM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm" CACHE STRING "Location of glm library." )
 
-MESSAGE( ${APP_RUNTIME_DIR} )
-MESSAGE( ${PROJECT_BINARY_DIR} )
-
 if( BGFX_USE_OVR )
 	include( cmake/ovr.cmake )
 endif()
