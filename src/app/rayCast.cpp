@@ -83,10 +83,10 @@ namespace mc {
 			(step.y > 0 ? cameraPos.y < getHeight() : cameraPos.y >= 0) &&
 			(step.z > 0 ? cameraPos.z < getWidth() : cameraPos.z >= 0)) {
 
-			//drawStepPoints(
-			//	cameraPos.x - xHack
-			//	, cameraPos.y
-			//	, cameraPos.z - yHack);
+			drawStepPoints(
+				cameraPos.x - xHack
+				, cameraPos.y
+				, cameraPos.z - yHack);
 
 			// Invoke the callback, unless we are not *yet* within the bounds of the
 			// world.

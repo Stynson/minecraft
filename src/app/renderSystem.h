@@ -20,7 +20,7 @@
 
 static void debugPoint(float x, float y, float z) {
 	ddPush();
-	Sphere sphere = { { x, y, z }, 0.1f };
+	Sphere sphere = { { x, y, z }, 0.01f };
 	ddSetColor(0xfff0c0ff);
 	ddSetWireframe(false);
 	ddDraw(sphere);
