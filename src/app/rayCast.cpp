@@ -23,14 +23,34 @@ namespace mc {
 
 		glm::vec3 direction = glm::normalize(cameraData.lookAt - cameraData.pos);
 		auto cameraPos = cameraData.pos;
-		if (cameraPos.x > 0) while (cameraPos.x > Chunk::WIDTH) cameraPos.x -= Chunk::WIDTH;
-		else while (cameraPos.x < 0) cameraPos.x += Chunk::WIDTH;
+		auto cameraMaxHorizontalPos = Chunk::WIDTH * std::ceil(mMatrixSize / 2.0f) * mBlockSize;
+		auto cameraMinHorizontalPos = Chunk::WIDTH * std::floor(mMatrixSize / 2.0f) * mBlockSize;
+
+		int xHack = 0;
+		int yHack = 0;
+
+		while (cameraPos.x > cameraMaxHorizontalPos) {
+			cameraPos.x -= Chunk::WIDTH; 
+			xHack -= Chunk::WIDTH;
+		}
+		while (cameraPos.x < cameraMinHorizontalPos) { 
+			cameraPos.x += Chunk::WIDTH;
+			xHack += Chunk::WIDTH;
+		}
 
 		if (cameraPos.y > 0) while (cameraPos.y > Chunk::HEIGHT) cameraPos.y -= Chunk::HEIGHT;
 		else while (cameraPos.y < 0) cameraPos.y += Chunk::HEIGHT;
 
-		if (cameraPos.z > 0) while (cameraPos.z > Chunk::WIDTH) cameraPos.z -= Chunk::WIDTH;
-		else while (cameraPos.z < 0) cameraPos.z += Chunk::WIDTH;
+		while (cameraPos.z > cameraMaxHorizontalPos) {
+			cameraPos.z -= Chunk::WIDTH;
+			yHack -= Chunk::WIDTH;
+		}
+		while (cameraPos.z < cameraMinHorizontalPos) {
+			cameraPos.z += Chunk::WIDTH;
+			yHack += Chunk::WIDTH;
+		}
+
+		LOG("cam2: %f, %f\n", cameraPos.x, cameraPos.z)
 
 		// Direction to increment x,y,z when stepping.
 		auto step = glm::vec3(
@@ -40,14 +60,14 @@ namespace mc {
 		// See description above. The initial values depend on the fractional
 		// part of the cameraPos.
 		auto tMax = glm::vec3(
-			intbound(cameraPos[0], direction.x)
-			, intbound(cameraPos[1], direction.y)
-			, intbound(cameraPos[2], direction.z));
+			intbound(cameraPos.x, direction.x)
+			, intbound(cameraPos.y, direction.y)
+			, intbound(cameraPos.y, direction.z));
 		// The change in t when taking a step (always positive).
 		auto tDelta = glm::vec3(
-			step.x / direction.x / precision
-			, step.y / direction.y / precision
-			, step.z / direction.z / precision);
+			step.x / direction.x / mPrecision
+			, step.y / direction.y / mPrecision
+			, step.z / direction.z / mPrecision);
 
 		// Avoids an infinite loop.
 		//if (dx === 0 && dy == = 0 && dz === 0)
@@ -55,15 +75,18 @@ namespace mc {
 
 		// Rescale from units of 1 cube-edge to units of 'direction' so we can
 		// compare with 't'.
-		radius /= precision;
-		radius /= std::sqrt(direction.x*direction.x + direction.y * direction.y + direction.z * direction.z);
+		radius /= mPrecision;
+		radius /= std::sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
 
 		while (/* ray has not gone past bounds of world */
 			(step.x > 0 ? cameraPos.x < getWidth() : cameraPos.x >= 0) &&
 			(step.y > 0 ? cameraPos.y < getHeight() : cameraPos.y >= 0) &&
 			(step.z > 0 ? cameraPos.z < getWidth() : cameraPos.z >= 0)) {
 
-			drawStepPoints(cameraPos.x, cameraPos.y, cameraPos.z);
+			//drawStepPoints(
+			//	cameraPos.x - xHack
+			//	, cameraPos.y
+			//	, cameraPos.z - yHack);
 
 			// Invoke the callback, unless we are not *yet* within the bounds of the
 			// world.
@@ -78,7 +101,10 @@ namespace mc {
 			{
 				if (int(getBlock(cameraPos.x, cameraPos.y, cameraPos.z)->type) > 0)
 				{
-					return &glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z);
+					return &glm::vec3(
+						cameraPos.x - xHack
+						, cameraPos.y
+						, cameraPos.z - yHack);
 				}
 			}
 			// tMaxX stores the t-value at which we cross a cube boundary along the
@@ -137,7 +163,7 @@ namespace mc {
 	}
 
 	float RayCast::signum(float x) const {
-		return x > 0 ? precision : x < 0 ? -precision : 0.0f;
+		return x > 0 ? mPrecision : x < 0 ? -mPrecision : 0.0f;
 	}
 
 	float RayCast::mod(float value, float modulus) const {

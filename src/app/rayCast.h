@@ -13,26 +13,37 @@ namespace mc
 
 	class RayCast {
 	public:
-		RayCast(core::Vector<Chunk*> chunks) : mChunks(chunks), precision(0.1f) {}
+		RayCast(core::Vector<Chunk*> chunks) : mChunks(chunks), mPrecision(0.1f)
+		{
+			mMatrixSize = std::sqrt(chunks.size());
+		}
 
 		glm::vec3* raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) const;
 
 	private:
 		core::Vector<Chunk*> mChunks;
-		float precision;
+		float mPrecision;
+		int mMatrixSize;
+		int mBlockSize = 1;
 
 		float intbound(float s, float ds) const;
 		float signum(float x) const;
 		float mod(float value, float modulus) const;
 
-		int getWidth() const { return Chunk::WIDTH * mChunks.size() / 2 * 2; }
-		int getHeight() const { return Chunk::HEIGHT * mChunks.size() / 2 * 2; }
+		int getWidth() const { return Chunk::WIDTH * mMatrixSize * mBlockSize; }
+		int getHeight() const { return Chunk::HEIGHT * mMatrixSize * mBlockSize; }
 
 		Block* getBlock(float _x, float _y, float _z) const {
-			auto x = int(_x / 2);
-			auto y = int(_y / 2);
-			auto z = int(_z / 2);
-			return &mChunks[x / Chunk::WIDTH * mChunks.size() / 2 + z / Chunk::WIDTH]->getBlock(x % Chunk::WIDTH, y, z % Chunk::WIDTH);
+			auto x = int(_x / mBlockSize);
+			auto y = int(_y / mBlockSize);
+			auto z = int(_z / mBlockSize);
+			return &mChunks[int(z / Chunk::WIDTH) * mMatrixSize + int(x / Chunk::WIDTH)]->getBlock(x % Chunk::WIDTH, y, z % Chunk::WIDTH);
+		}
+
+		Chunk* getChunk(float _x, float _y, float _z) const {
+			auto x = int(_x / mBlockSize / Chunk::WIDTH);
+			auto z = int(_z / mBlockSize / Chunk::WIDTH);
+			return mChunks[z * mMatrixSize + x];
 		}
 	};
 

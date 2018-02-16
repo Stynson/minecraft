@@ -180,23 +180,12 @@ namespace mc
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				//auto nearChunks = mCellSystem.getNearbyChunks(mCameraData, 1);
-				int offset = mCameraData.chunkSize * mCameraData.blockSize;
-				int x = mCameraData.pos.x / offset;
-				int z = mCameraData.pos.z / offset;
-				Chunk * c = mCellSystem.getChunk(x, z);
-				auto nearChunks = core::Vector<Chunk*>(0);
-				nearChunks.push_back(c);
+				auto nearChunks = mCellSystem.getNearbyChunks(mCameraData, 1);
 				RayCast rc(nearChunks);
 				auto selectedBlock = rc.raycast(mCameraData, 20, debugPoint);
 				if (selectedBlock != nullptr) {
 					drawBlockGizmo(*selectedBlock);
 				}
-				//auto block = rc.raycast(mCameraData, 20, debugPoint);
-				//if (block != nullptr)
-				//{
-				//	selectedBlock = *block;
-				//}
 
 				startRender();
 				renderSkybox();
@@ -206,7 +195,7 @@ namespace mc
 				for (auto& mesh : meshes)
 				{
 					auto transform = glm::mat4(1.0f);
-					transform = glm::translate(transform, glm::vec3(1.0f));
+					transform = glm::translate(transform, glm::vec3(0.5f));
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
@@ -267,12 +256,12 @@ namespace mc
 		{
 			ddPush();
 			Aabb aabb;
-			aabb.m_min[0] = std::trunc(selectedBlock.x / 2) * 2;
-			aabb.m_min[1] = std::trunc(selectedBlock.y / 2) * 2;
-			aabb.m_min[2] = std::trunc(selectedBlock.z / 2) * 2;
-			aabb.m_max[0] = std::trunc(selectedBlock.x / 2) * 2 + 2.0f;
-			aabb.m_max[1] = std::trunc(selectedBlock.y / 2) * 2 + 2.0f;
-			aabb.m_max[2] = std::trunc(selectedBlock.z / 2) * 2 + 2.0f;
+			aabb.m_min[0] = std::trunc(selectedBlock.x);
+			aabb.m_min[1] = std::trunc(selectedBlock.y);
+			aabb.m_min[2] = std::trunc(selectedBlock.z);
+			aabb.m_max[0] = std::trunc(selectedBlock.x) + 1.0f;
+			aabb.m_max[1] = std::trunc(selectedBlock.y) + 1.0f;
+			aabb.m_max[2] = std::trunc(selectedBlock.z) + 1.0f;
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);
 			ddDraw(aabb);
@@ -286,7 +275,7 @@ namespace mc
 			{
 				glm::mat4 debugCameraView;
 				glm::vec3 zero(0.0f);
-				glm::vec3 eye(50.0f, 70.0f, 50.0f);
+				glm::vec3 eye(25.0f, 35.0f, 25.0f);
 				bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
 				auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 

@@ -52,39 +52,39 @@ namespace mc
 	static PosNormalTangentTexcoordVertex s_cubeVertices[24] =
 	{
 		// BACK
-		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0 },
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  atlasIndex, 0 },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, atlasIndex },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  atlasIndex, atlasIndex },
+		{ -0.5f,  0.5f,  0.5f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, 0 },
+		{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  atlasIndex, 0 },
+		{ -0.5f, -0.5f,  0.5f, encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  0, atlasIndex },
+		{ 0.5f, -0.5f,  0.5f,  encodeNormalRgba8(0.0f,  0.0f,  1.0f), 0,  atlasIndex, atlasIndex },
 		// FRONT
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, 0 },
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, atlasIndex },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, atlasIndex },
+		{ 0.5f,  0.5f, -0.5f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, 0 },
+		{ -0.5f,  0.5f, -0.5f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, 0 },
+		{ 0.5f, -0.5f, -0.5f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, atlasIndex },
+		{ -0.5f, -0.5f, -0.5f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, atlasIndex },
 		// LEFT
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, atlasIndex },
-		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, 0 },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, atlasIndex },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
+		{ -0.5f,  0.5f, -0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, atlasIndex },
+		{ -0.5f,  0.5f,  0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, 0 },
+		{ -0.5f, -0.5f, -0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, atlasIndex },
+		{ -0.5f, -0.5f,  0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
 		// RIGHT
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, 0 },
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, atlasIndex },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, atlasIndex },
+		{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, 0 },
+		{ 0.5f,  0.5f, -0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		{ 0.5f, -0.5f,  0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
+		{ 0.5f, -0.5f, -0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, atlasIndex },
 		// UP
-		//{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
-		//{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
-		//{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
-		//{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, atlasIndex },
-		{ 1.0f,  1.0f,  1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
-		{ -1.0f,  1.0f,  1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
-		{ 1.0f,  1.0f, -1.0f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
-		{ -1.0f,  1.0f, -1.0f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, atlasIndex},
+		//{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
+		//{ -0.5f,  0.5f,  0.5f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
+		//{ 0.5f,  0.5f, -0.5f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		//{ -0.5f,  0.5f, -0.5f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, atlasIndex },
+		{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
+		{ -0.5f,  0.5f,  0.5f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
+		{ 0.5f,  0.5f, -0.5f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		{ -0.5f,  0.5f, -0.5f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, atlasIndex},
 		// DOWN
-		{ 1.0f, -1.0f, -1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
-		{ -1.0f, -1.0f, -1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, atlasIndex },
-		{ 1.0f, -1.0f,  1.0f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  atlasIndex, 0 },
-		{ -1.0f, -1.0f,  1.0f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
+		{ 0.5f, -0.5f, -0.5f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  atlasIndex, atlasIndex },
+		{ -0.5f, -0.5f, -0.5f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, atlasIndex },
+		{ 0.5f, -0.5f,  0.5f,  encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  atlasIndex, 0 },
+		{ -0.5f, -0.5f,  0.5f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
 	};
 
 	static const uint16_t s_cubeFaceIndices[24] =
@@ -177,9 +177,9 @@ namespace mc
 			for (auto i = vBegin; i < vBegin + 4; i++)
 			{
 				PosNormalTangentTexcoordVertex clone = s_cubeVertices[i];
-				clone.m_x += 2 * x;
-				clone.m_y += 2 * y;
-				clone.m_z += 2 * z;
+				clone.m_x += blockSize * x;
+				clone.m_y += blockSize * y;
+				clone.m_z += blockSize * z;
 				clone.m_u += blockIndex % blockPerRow * 2048;
 				clone.m_v += blockIndex / blockPerRow * 2048;
 				vertices.push_back(clone);
@@ -221,7 +221,7 @@ namespace mc
 		}
 
 		int chunkSize = 16;
-		float blockSize = 2;
+		float blockSize = 1;
 
 		glm::vec3 getChunkPosition()
 		{

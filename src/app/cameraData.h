@@ -24,7 +24,7 @@ namespace mc
 		int viewDistance = 8; //chunks
 		int chunkSize = 16;
 		//More like render data
-		float blockSize = 2;
+		float blockSize = 1;
 
 		glm::mat4 view;
 		glm::vec3 pos;
