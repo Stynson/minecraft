@@ -18,8 +18,6 @@
 
 #include <debugdraw/debugdraw.h>
 
-#define DEBUG 0
-
 static void debugPoint(float x, float y, float z) {
 	ddPush();
 	Sphere sphere = { { x, y, z }, 0.1f };
@@ -182,42 +180,20 @@ namespace mc
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				//LOG("%d\n", m_mouseState.m_buttons[entry::MouseButton::Left]);
-				//if (mouseClicked)
-				//{
-				//	mouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;
-				//}
-				//else
-				//{
-				//	if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) {
-						mouseClicked = true;
-						int offset = mCameraData.chunkSize * mCameraData.blockSize;
-						int x = mCameraData.pos.x / offset;
-						int z = mCameraData.pos.z / offset;
-						Chunk* c = mCellSystem.getChunk(x, z);
-						auto chunks = core::Vector<Chunk*>(0);
-						chunks.push_back(c);
-						RayCast rc(chunks);
-						glm::vec3 ray = glm::normalize(mCameraData.lookAt - mCameraData.pos);
-						auto pos = mCameraData.pos;
-						if (pos.x > 0) while (pos.x > Chunk::WIDTH) pos.x -= Chunk::WIDTH;
-						else while (pos.x < 0) pos.x += Chunk::WIDTH;
+				mouseClicked = true;
+				int offset = mCameraData.chunkSize * mCameraData.blockSize;
+				int x = mCameraData.pos.x / offset;
+				int z = mCameraData.pos.z / offset;
+				Chunk* c = mCellSystem.getChunk(x, z);
+				auto chunks = core::Vector<Chunk*>(0);
+				chunks.push_back(c);
 
-						if (pos.y > 0) while (pos.y > Chunk::HEIGHT) pos.y -= Chunk::HEIGHT;
-						else while (pos.y < 0) pos.y += Chunk::HEIGHT;
-
-						if (pos.z > 0) while (pos.z > Chunk::WIDTH) pos.z -= Chunk::WIDTH;
-						else while (pos.z < 0) pos.z += Chunk::WIDTH;
-						//pos /= 2.0f;
-
-						auto block = rc.raycast(pos, ray, 20, debugPoint);
-						if (block != nullptr)
-						{
-							selectedBlock = *block;
-							LOG("selected block: %f, %f, %f\n", selectedBlock.x, selectedBlock.y, selectedBlock.z);
-						}
-				//	}
-				//}
+				RayCast rc(chunks);
+				auto block = rc.raycast(mCameraData, 20, debugPoint);
+				if (block != nullptr)
+				{
+					selectedBlock = *block;
+				}
 
 				startRender();
 				renderSkybox();
@@ -271,7 +247,7 @@ namespace mc
 		}
 
 		void drawChunkGizmos()
-		{ 
+		{
 			ddPush();
 			Aabb aabb;
 			auto chunkOffset = mCameraData.chunkSize*mCameraData.blockSize;
@@ -279,7 +255,7 @@ namespace mc
 			aabb.m_min[1] = 0;
 			aabb.m_min[2] = 0;
 			aabb.m_max[0] = chunkOffset;
-			aabb.m_max[1] = chunkOffset*2;
+			aabb.m_max[1] = chunkOffset * 2;
 			aabb.m_max[2] = chunkOffset;
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);
@@ -456,7 +432,7 @@ namespace mc
 
 		struct DebugData
 		{
-			bool isFirstPerson = true; 
+			bool isFirstPerson = true;
 			bool showChunkGizmos = false;
 		};
 		DebugData mDebugData;

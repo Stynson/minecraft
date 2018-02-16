@@ -2,6 +2,7 @@
 
 #include "core.h"
 #include "chunk.h"
+#include "cameraData.h"
 
 #include <cmath>
 #include <glm/vec3.hpp>
@@ -14,7 +15,7 @@ namespace mc
 	public:
 		RayCast(core::Vector<Chunk*> chunks) : mChunks(chunks), precision(0.1f) {}
 
-		glm::vec3* raycast(glm::vec3 origin, glm::vec3 direction, float radius, void(*drawStepPoints)(float, float, float)) {
+		glm::vec3* raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) {
 			// From "A Fast Voxel Traversal Algorithm for Ray Tracing"
 			// by John Amanatides and Andrew Woo, 1987
 			// <http://www.cse.yorku.ca/~amana/research/grid.pdf>
@@ -26,108 +27,110 @@ namespace mc
 
 			// The foundation of this algorithm is a parameterized representation of
 			// the provided ray,
-			//                    origin + t * direction,
+			//                    cameraPos + t * direction,
 			// except that t is not actually stored; rather, at any given point in the
 			// traversal, we keep track of the *greater* t values which we would have
 			// if we took a step sufficient to cross a cube boundary along that axis
 			// (i.e. change the integer part of the coordinate) in the variables
 			// tMaxX, tMaxY, and tMaxZ.
 
-			// Cube containing origin point.
-			auto x = origin[0];
-			auto y = origin[1];
-			auto z = origin[2];
-			// Break out direction vector.
-			auto dx = direction[0];
-			auto dy = direction[1];
-			auto dz = direction[2];
+			
+			glm::vec3 direction = glm::normalize(cameraData.lookAt - cameraData.pos);
+			auto cameraPos = cameraData.pos;
+			if (cameraPos.x > 0) while (cameraPos.x > Chunk::WIDTH) cameraPos.x -= Chunk::WIDTH;
+			else while (cameraPos.x < 0) cameraPos.x += Chunk::WIDTH;
+
+			if (cameraPos.y > 0) while (cameraPos.y > Chunk::HEIGHT) cameraPos.y -= Chunk::HEIGHT;
+			else while (cameraPos.y < 0) cameraPos.y += Chunk::HEIGHT;
+
+			if (cameraPos.z > 0) while (cameraPos.z > Chunk::WIDTH) cameraPos.z -= Chunk::WIDTH;
+			else while (cameraPos.z < 0) cameraPos.z += Chunk::WIDTH;
+
 			// Direction to increment x,y,z when stepping.
-			auto stepX = signum(dx);
-			auto stepY = signum(dy);
-			auto stepZ = signum(dz);
+			auto step = glm::vec3(
+				signum(direction.x)
+				, signum(direction.y)
+				, signum(direction.z));
 			// See description above. The initial values depend on the fractional
-			// part of the origin.
-			auto tMaxX = intbound(origin[0], dx);
-			auto tMaxY = intbound(origin[1], dy);
-			auto tMaxZ = intbound(origin[2], dz);
+			// part of the cameraPos.
+			auto tMax = glm::vec3(
+				intbound(cameraPos[0], direction.x)
+				, intbound(cameraPos[1], direction.y)
+				, intbound(cameraPos[2], direction.z));
 			// The change in t when taking a step (always positive).
-			//auto tDeltaX = stepX / dx;
-			//auto tDeltaY = stepY / dy;
-			//auto tDeltaZ = stepZ / dz;
-			auto tDeltaX = stepX / dx / precision;
-			auto tDeltaY = stepY / dy / precision;
-			auto tDeltaZ = stepZ / dz / precision;
-			// Buffer for reporting faces to the callback.
-			auto face = glm::vec3(1.0f);
+			auto tDelta = glm::vec3(
+				step.x / direction.x / precision
+				, step.y / direction.y / precision
+				, step.z / direction.z / precision);
 
 			// Avoids an infinite loop.
-			//if (dx == = 0 && dy == = 0 && dz == = 0)
+			//if (dx === 0 && dy == = 0 && dz === 0)
 			//	throw new RangeError("Raycast in zero direction!");
 
 			// Rescale from units of 1 cube-edge to units of 'direction' so we can
 			// compare with 't'.
 			radius /= precision;
-			radius /= std::sqrt(dx*dx + dy*dy + dz*dz);
+			radius /= std::sqrt(direction.x*direction.x + direction.y * direction.y + direction.z * direction.z);
 
 			while (/* ray has not gone past bounds of world */
-				(stepX > 0 ? x < getWidth() : x >= 0) &&
-				(stepY > 0 ? y < getHeight() : y >= 0) &&
-				(stepZ > 0 ? z < getWidth() : z >= 0)) {
+				(step.x > 0 ? cameraPos.x < getWidth() : cameraPos.x >= 0) &&
+				(step.y > 0 ? cameraPos.y < getHeight() : cameraPos.y >= 0) &&
+				(step.z > 0 ? cameraPos.z < getWidth() : cameraPos.z >= 0)) {
 
-				drawStepPoints(x, y, z);
+				drawStepPoints(cameraPos.x, cameraPos.y, cameraPos.z);
 
 				// Invoke the callback, unless we are not *yet* within the bounds of the
 				// world.
-				if (!(x < 0 || y < 0 || z < 0 || x >= getWidth() || y >= getHeight() || z >= getWidth()))
-					//if (callback(x, y, z, blocks[x*wy*wz + y * wz + z], face))
-					//	break;
-					//LOG("%d - %f, %f, %f\n", int(getBlock(x, y, z)->type), x/2, y/2, z/2);
-					if(int(getBlock(x,y,z)->type) > 0) return &glm::vec3(x, y, z);
-
+				if (!(
+					cameraPos.x < 0
+					|| cameraPos.y < 0
+					|| cameraPos.z < 0
+					|| cameraPos.x >= getWidth()
+					|| cameraPos.y >= getHeight()
+					|| cameraPos.z >= getWidth())
+					)
+				{
+					if (int(getBlock(cameraPos.x, cameraPos.y, cameraPos.z)->type) > 0)
+					{
+						return &glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z);
+					}
+				}
 				// tMaxX stores the t-value at which we cross a cube boundary along the
 				// X axis, and similarly for Y and Z. Therefore, choosing the least tMax
 				// chooses the closest cube boundary. Only the first case of the four
 				// has been commented in detail.
-				if (tMaxX < tMaxY) {
-					if (tMaxX < tMaxZ) {
-						if (tMaxX > radius) break;
+				if (tMax.x < tMax.y)
+				{
+					if (tMax.x < tMax.z)
+					{
+						if (tMax.x > radius) break;
 						// Update which cube we are now in.
-						x += stepX;
+						cameraPos.x += step.x;
 						// Adjust tMaxX to the next X-oriented boundary crossing.
-						tMaxX += tDeltaX;
-						// Record the normal vector of the cube face we entered.
-						face[0] = -stepX;
-						face[1] = 0;
-						face[2] = 0;
+						tMax.x += tDelta.x;
 					}
-					else {
-						if (tMaxZ > radius) break;
-						z += stepZ;
-						tMaxZ += tDeltaZ;
-						face[0] = 0;
-						face[1] = 0;
-						face[2] = -stepZ;
+					else
+					{
+						if (tMax.z > radius) break;
+						cameraPos.z += step.z;
+						tMax.z += tDelta.z;
 					}
 				}
 				else
 				{
-					if (tMaxY < tMaxZ) {
-						if (tMaxY > radius) break;
-						y += stepY;
-						tMaxY += tDeltaY;
-						face[0] = 0;
-						face[1] = -stepY;
-						face[2] = 0;
+					if (tMax.y < tMax.z)
+					{
+						if (tMax.y > radius) break;
+						cameraPos.y += step.y;
+						tMax.y += tDelta.y;
 					}
-					else {
+					else
+					{
 						// Identical to the second case, repeated for simplicity in
 						// the conditionals.
-						if (tMaxZ > radius) break;
-						z += stepZ;
-						tMaxZ += tDeltaZ;
-						face[0] = 0;
-						face[1] = 0;
-						face[2] = -stepZ;
+						if (tMax.z > radius) break;
+						cameraPos.z += step.z;
+						tMax.z += tDelta.z;
 					}
 				}
 			}
@@ -139,20 +142,13 @@ namespace mc
 			if (ds < 0) {
 				return intbound(-s, -ds);
 			}
-			else {
+			else
+			{
 				s = mod(s, 1);
 				// problem is now s+t*ds = 1
 				return (1 - s) / ds;
 			}
 		}
-
-		//int signum(float x) {
-		//	return x > 0 ? 1 : x < 0 ? -1 : 0;
-		//}
-
-		//int mod(int value, int modulus) {
-		//	return (value % modulus + modulus) % modulus;
-		//}
 
 		float signum(float x) {
 			return x > 0 ? precision : x < 0 ? -precision : 0.0f;
@@ -160,11 +156,10 @@ namespace mc
 
 		float mod(float value, float modulus) {
 			return std::fmod(std::fmod(value, modulus) + modulus, modulus);
-			//return std::fmod(value, modulus);
 		}
 
 		int getWidth() { return Chunk::WIDTH * mChunks.size() / 2 * 2; }
-		int getHeight() { return Chunk::HEIGHT * mChunks.size() / 2 * 2 ; }
+		int getHeight() { return Chunk::HEIGHT * mChunks.size() / 2 * 2; }
 
 		Block* getBlock(float _x, float _y, float _z) {
 			auto x = int(_x / 2);
