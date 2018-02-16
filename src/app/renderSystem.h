@@ -20,6 +20,15 @@
 
 #define DEBUG 0
 
+static void debugPoint(float x, float y, float z) {
+	ddPush();
+	Sphere sphere = { { x, y, z }, 0.1f };
+	ddSetColor(0xfff0c0ff);
+	ddSetWireframe(false);
+	ddDraw(sphere);
+	ddPop();
+}
+
 namespace mc
 {
 	inline glm::tmat4x4<float, glm::defaultp> perspective(float fovy, float aspect, float zNear, float zFar)
@@ -199,12 +208,13 @@ namespace mc
 
 						if (pos.z > 0) while (pos.z > Chunk::WIDTH) pos.z -= Chunk::WIDTH;
 						else while (pos.z < 0) pos.z += Chunk::WIDTH;
-						pos /= 2.0f;
-						auto block = rc.raycast(pos, ray, 20);
+						//pos /= 2.0f;
+
+						auto block = rc.raycast(pos, ray, 20, debugPoint);
 						if (block != nullptr)
 						{
 							selectedBlock = *block;
-							LOG("selected block: %f, %f, %f\n", selectedBlock.x*2, selectedBlock.y*2, selectedBlock.z*2);
+							LOG("selected block: %f, %f, %f\n", selectedBlock.x, selectedBlock.y, selectedBlock.z);
 						}
 				//	}
 				//}
@@ -217,6 +227,7 @@ namespace mc
 				for (auto& mesh : meshes)
 				{
 					auto transform = glm::mat4(1.0f);
+					transform = glm::translate(transform, glm::vec3(1.0f));
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
@@ -282,12 +293,12 @@ namespace mc
 		{
 			ddPush();
 			Aabb aabb;
-			aabb.m_min[0] = selectedBlock.x * 2 - 1.0f;
-			aabb.m_min[1] = selectedBlock.y * 2 - 1.0f;
-			aabb.m_min[2] = selectedBlock.z * 2 - 1.0f;
-			aabb.m_max[0] = selectedBlock.x * 2 + 1.0f;
-			aabb.m_max[1] = selectedBlock.y * 2 + 1.0f;
-			aabb.m_max[2] = selectedBlock.z * 2 + 1.0f;
+			aabb.m_min[0] = std::trunc(selectedBlock.x / 2) * 2;
+			aabb.m_min[1] = std::trunc(selectedBlock.y / 2) * 2;
+			aabb.m_min[2] = std::trunc(selectedBlock.z / 2) * 2;
+			aabb.m_max[0] = std::trunc(selectedBlock.x / 2) * 2 + 2.0f;
+			aabb.m_max[1] = std::trunc(selectedBlock.y / 2) * 2 + 2.0f;
+			aabb.m_max[2] = std::trunc(selectedBlock.z / 2) * 2 + 2.0f;
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);
 			ddDraw(aabb);
@@ -322,6 +333,9 @@ namespace mc
 				auto proj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 				bgfx::setViewTransform(0, &mCameraData.view[0][0], &proj[0][0]);
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
+
+				auto ppp = mCameraData.pos + glm::normalize(mCameraData.lookAt - mCameraData.pos);
+				ddDrawAxis(ppp[0], ppp[1], ppp[2]);
 			}
 		}
 		void endRender()
