@@ -180,20 +180,23 @@ namespace mc
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
-				mouseClicked = true;
+				//auto nearChunks = mCellSystem.getNearbyChunks(mCameraData, 1);
 				int offset = mCameraData.chunkSize * mCameraData.blockSize;
 				int x = mCameraData.pos.x / offset;
 				int z = mCameraData.pos.z / offset;
-				Chunk* c = mCellSystem.getChunk(x, z);
-				auto chunks = core::Vector<Chunk*>(0);
-				chunks.push_back(c);
-
-				RayCast rc(chunks);
-				auto block = rc.raycast(mCameraData, 20, debugPoint);
-				if (block != nullptr)
-				{
-					selectedBlock = *block;
+				Chunk * c = mCellSystem.getChunk(x, z);
+				auto nearChunks = core::Vector<Chunk*>(0);
+				nearChunks.push_back(c);
+				RayCast rc(nearChunks);
+				auto selectedBlock = rc.raycast(mCameraData, 20, debugPoint);
+				if (selectedBlock != nullptr) {
+					drawBlockGizmo(*selectedBlock);
 				}
+				//auto block = rc.raycast(mCameraData, 20, debugPoint);
+				//if (block != nullptr)
+				//{
+				//	selectedBlock = *block;
+				//}
 
 				startRender();
 				renderSkybox();
@@ -207,7 +210,6 @@ namespace mc
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
 
-				drawBlockGizmo();
 
 				if (mDebugData.showChunkGizmos)
 				{
@@ -220,8 +222,6 @@ namespace mc
 
 			return false;
 		}
-
-		bool mouseClicked = false;
 
 		void setupDebugWindow()
 		{
@@ -263,9 +263,7 @@ namespace mc
 			ddPop();
 		}
 
-		glm::vec3 selectedBlock;
-
-		void drawBlockGizmo()
+		void drawBlockGizmo(glm::vec3 selectedBlock)
 		{
 			ddPush();
 			Aabb aabb;

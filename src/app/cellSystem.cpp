@@ -14,12 +14,17 @@ namespace mc {
 		return mMap[key].get();
 	}
 
-	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData)
+	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData) {
+		auto distance = cameraData.viewDistance;
+		return getNearbyChunks(cameraData, distance);
+
+	}
+
+	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData, int distance)
 	{
 		int offset = cameraData.chunkSize * cameraData.blockSize;
 		int x = cameraData.pos.x / offset;
 		int z = cameraData.pos.z / offset;
-		auto distance = cameraData.viewDistance;
 		auto nearbyChunks = core::Vector<Chunk*>(0);
 		nearbyChunks.reserve((distance + 1) * (distance + 1));
 		for (auto i = x - distance; i <= x + distance; i++) {
