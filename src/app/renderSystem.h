@@ -6,6 +6,8 @@
 #include "common.h"
 #include "camera.h"
 #include "cameraData.h"
+#include "rayCast.h"
+
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 #include "preRenderSystem.h"
@@ -171,6 +173,42 @@ namespace mc
 				// if no other draw calls are submitted to view 0.
 				bgfx::touch(0);
 
+				//LOG("%d\n", m_mouseState.m_buttons[entry::MouseButton::Left]);
+				//if (mouseClicked)
+				//{
+				//	mouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;
+				//}
+				//else
+				//{
+				//	if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) {
+						mouseClicked = true;
+						int offset = mCameraData.chunkSize * mCameraData.blockSize;
+						int x = mCameraData.pos.x / offset;
+						int z = mCameraData.pos.z / offset;
+						Chunk* c = mCellSystem.getChunk(x, z);
+						auto chunks = core::Vector<Chunk*>(0);
+						chunks.push_back(c);
+						RayCast rc(chunks);
+						glm::vec3 ray = glm::normalize(mCameraData.lookAt - mCameraData.pos);
+						auto pos = mCameraData.pos;
+						if (pos.x > 0) while (pos.x > Chunk::WIDTH) pos.x -= Chunk::WIDTH;
+						else while (pos.x < 0) pos.x += Chunk::WIDTH;
+
+						if (pos.y > 0) while (pos.y > Chunk::HEIGHT) pos.y -= Chunk::HEIGHT;
+						else while (pos.y < 0) pos.y += Chunk::HEIGHT;
+
+						if (pos.z > 0) while (pos.z > Chunk::WIDTH) pos.z -= Chunk::WIDTH;
+						else while (pos.z < 0) pos.z += Chunk::WIDTH;
+						pos /= 2.0f;
+						auto block = rc.raycast(pos, ray, 20);
+						if (block != nullptr)
+						{
+							selectedBlock = *block;
+							LOG("selected block: %f, %f, %f\n", selectedBlock.x*2, selectedBlock.y*2, selectedBlock.z*2);
+						}
+				//	}
+				//}
+
 				startRender();
 				renderSkybox();
 
@@ -181,6 +219,8 @@ namespace mc
 					auto transform = glm::mat4(1.0f);
 					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
 				}
+
+				drawBlockGizmo();
 
 				if (mDebugData.showChunkGizmos)
 				{
@@ -193,6 +233,8 @@ namespace mc
 
 			return false;
 		}
+
+		bool mouseClicked = false;
 
 		void setupDebugWindow()
 		{
@@ -208,6 +250,7 @@ namespace mc
 				, NULL
 				, 0
 			);
+			ImGui::Text("CameraPos: %f, %f, %f\n", mCameraData.pos.x, mCameraData.pos.y, mCameraData.pos.z);
 			ImGui::SliderFloat("Custom", &frustrumFarDistance, 0.0f, 100.0f);
 			if (ImGui::Button("FPS View", { 0, 30 }))
 				mDebugData.isFirstPerson = !mDebugData.isFirstPerson;
@@ -227,6 +270,24 @@ namespace mc
 			aabb.m_max[0] = chunkOffset;
 			aabb.m_max[1] = chunkOffset*2;
 			aabb.m_max[2] = chunkOffset;
+			ddSetColor(0xfff0c0ff);
+			ddSetWireframe(true);
+			ddDraw(aabb);
+			ddPop();
+		}
+
+		glm::vec3 selectedBlock;
+
+		void drawBlockGizmo()
+		{
+			ddPush();
+			Aabb aabb;
+			aabb.m_min[0] = selectedBlock.x * 2 - 1.0f;
+			aabb.m_min[1] = selectedBlock.y * 2 - 1.0f;
+			aabb.m_min[2] = selectedBlock.z * 2 - 1.0f;
+			aabb.m_max[0] = selectedBlock.x * 2 + 1.0f;
+			aabb.m_max[1] = selectedBlock.y * 2 + 1.0f;
+			aabb.m_max[2] = selectedBlock.z * 2 + 1.0f;
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);
 			ddDraw(aabb);
