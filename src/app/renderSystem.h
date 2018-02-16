@@ -74,7 +74,7 @@ namespace mc
 			// Create program from shaders.
 			m_program = loadProgram("vs_cubes", "fs_cubes");
 			// Load diffuse texture.
-			m_textureColor = loadTexture("textures/terrain.png");
+			m_textureColor = loadTexture("textures/terrain.png", BGFX_TEXTURE_MAG_POINT);
 
 			//m_skybox = loadTexture("textures/fieldstone-rgba.dds");
 			m_skybox = loadTexture("textures/skybox.dds");
@@ -388,9 +388,7 @@ namespace mc
 		};
 		DebugData mDebugData;
 
-#if DEBUG == 1
 		float frustrumFarDistance;
-#endif
 	};
 
 
