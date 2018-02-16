@@ -112,9 +112,7 @@ namespace mc
 
 			imguiCreate();
 
-#if DEBUG == 1
 			frustrumFarDistance = 200.0f;
-#endif
 			cameraCreate();
 
 			const float initialPos[3] = { 5.0f, 20.0, 0.0f };
@@ -242,7 +240,7 @@ namespace mc
 			{
 				glm::mat4 debugCameraView;
 				glm::vec3 zero(0.0f);
-				glm::vec3 eye(30.0f, 50.0f, 30.0f);
+				glm::vec3 eye(50.0f, 70.0f, 50.0f);
 				bx::mtxLookAt(&debugCameraView[0][0], &eye[0], &zero[0]);
 				auto debugCameraProj = perspective(mCameraData.fov, mCameraData.ratio, mCameraData.nearDist, mCameraData.farDist);
 
@@ -388,9 +386,7 @@ namespace mc
 		};
 		DebugData mDebugData;
 
-#if DEBUG == 1
 		float frustrumFarDistance;
-#endif
 	};
 
 

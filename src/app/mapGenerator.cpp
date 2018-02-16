@@ -2,25 +2,42 @@
 #include "core.h"
 #include <iostream>
 #include <cmath>
+#include <numeric>
 
 namespace mc
-{ 
+{
+
+	static int num = 4;
+
 	std::unique_ptr<Chunk> MapGenerator::generate(int x, int z) const
 	{
 		auto chunk = std::make_unique<Chunk>(x, z);
 		double height;
-		for (auto i = 0; i < Chunk::WIDTH; i++)
+		for (auto i = 0; i < Chunk::WIDTH / num; i++)
 		{
-			for (auto j = 0; j < Chunk::WIDTH; j++)
+			for (auto j = 0; j < Chunk::WIDTH / num; j++)
 			{
-				height = mPerlinNoise.noise(chunk->getX() + i, chunk->getZ() + j, -0.2);
-				height -= floor(height);
-				height *= Chunk::HEIGHT;
-				for (auto y = 0; y < height - 1; y++)
+				core::Vector<float> heights(num*num);
+				for (int k = 0; k < num*num; k++)
 				{
-					chunk->setBlockType(BlockType::DIRT, i, y, j);
+					heights.push_back(mPerlinNoise.noise((chunk->getX() + i * num) + k / num, (chunk->getZ() + j * num) + k % num, 0.8));
 				}
-				chunk->setBlockType(BlockType::GRASS_DIRT, i, height, j);
+				float average = std::accumulate(heights.begin(), heights.end(), 0.0) / heights.size();
+				average -= floor(average);
+				average *= Chunk::HEIGHT;
+				for (auto l = (i*num); l < (i * num + num); l++)
+				{
+					for (auto m = (j * num); m < (j * num + num); m++)
+					{
+						//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
+						//height -= floor(height);
+						for (auto y = 0; y < average - 1; y++)
+						{
+							chunk->setBlockType(BlockType::DIRT, l, y, m);
+						}
+						chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
+					}
+				}
 			}
 		}
 		generateTrees(*chunk);
