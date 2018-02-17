@@ -35,4 +35,22 @@ namespace mc {
 		return nearbyChunks;
 	}
 
+	void CellSystem::setBlockType(BlockType type, glm::vec3 worldCoord)
+	{
+		int offset = Chunk::WIDTH * 1;
+		int chunkX = std::floor(worldCoord.x / offset);
+		int chunkZ = std::floor(worldCoord.z / offset);
+		Chunk* currentChunk = getChunk(chunkX, chunkZ);
+
+		auto blockX = worldCoord.x;
+		auto blockZ = worldCoord.z;
+		while (blockX > Chunk::WIDTH) blockX -= Chunk::WIDTH;
+		while (blockX < Chunk::WIDTH) blockX += Chunk::WIDTH;
+		while (blockZ > Chunk::WIDTH) blockZ -= Chunk::WIDTH;
+		while (blockZ < Chunk::WIDTH) blockZ += Chunk::WIDTH;
+		blockX = std::floor(std::fmod(blockX, offset));
+		blockZ = std::floor(std::fmod(blockZ, offset));
+		currentChunk->setBlockType(type, blockX, worldCoord.y, blockZ);
+	}
+
 }

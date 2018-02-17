@@ -21,7 +21,8 @@
 static void debugPoint(float x, float y, float z) {
 	ddPush();
 	Sphere sphere = { { x, y, z }, 0.01f };
-	ddSetColor(0x3f50ffff);
+	//ddSetColor(0x3f50ffff);
+	ddSetColor(0xA52A2AFF);
 	ddSetWireframe(false);
 	ddDraw(sphere);
 	ddPop();
@@ -184,7 +185,19 @@ namespace mc
 				RayCast rc(nearChunks);
 				auto selectedBlock = rc.raycast(mCameraData, 20, debugPoint);
 				if (selectedBlock != nullptr) {
+					glm::vec3 block(*selectedBlock);
 					drawBlockGizmo(*selectedBlock);
+					if (mMouseClicked)
+					{
+						mMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;
+					}
+					else
+					{
+						if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) {
+							mMouseClicked = true;
+							mCellSystem.setBlockType(BlockType::AIR, glm::vec3(block));
+						}
+					}
 				}
 
 				startRender();
@@ -425,6 +438,7 @@ namespace mc
 		DebugData mDebugData;
 
 		float frustrumFarDistance;
+		bool mMouseClicked = false;
 	};
 
 

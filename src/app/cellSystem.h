@@ -18,6 +18,7 @@ namespace mc {
 		Chunk* getChunk(int x, int z) ;
 		core::Vector<Chunk*> getNearbyChunks(const CameraData& cameraData);
 		core::Vector<Chunk*> getNearbyChunks(const CameraData& cameraData, int distance);
+		void setBlockType(BlockType type, glm::vec3 worldCoord);
 
 	private:
 		std::unordered_map<core::String, std::unique_ptr<Chunk>> mMap;
