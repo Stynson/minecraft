@@ -21,7 +21,7 @@
 static void debugPoint(float x, float y, float z) {
 	ddPush();
 	Sphere sphere = { { x, y, z }, 0.01f };
-	ddSetColor(0xfff0c0ff);
+	ddSetColor(0x3f50ffff);
 	ddSetWireframe(false);
 	ddDraw(sphere);
 	ddPop();
@@ -69,7 +69,7 @@ namespace mc
 			// Set view 0 clear state.
 			bgfx::setViewClear(0
 				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-				, 0x303030ff
+				, 0x87ceebff
 				, 1.0f
 				, 0
 			);
@@ -188,7 +188,7 @@ namespace mc
 				}
 
 				startRender();
-				renderSkybox();
+				//renderSkybox();
 
 				auto meshes = mPreRenderSystem.getMeshes(mCameraData);
 				auto chunkOffset = mCameraData.blockSize * mCameraData.chunkSize;
