@@ -31,7 +31,7 @@ namespace mc
 		float mod(float value, float modulus) const;
 
 		int getWidth() const { return Chunk::WIDTH * mMatrixSize * mBlockSize; }
-		int getHeight() const { return Chunk::HEIGHT * mMatrixSize * mBlockSize; }
+		int getHeight() const { return Chunk::HEIGHT * mBlockSize; }
 
 		Block* getBlock(float _x, float _y, float _z) const {
 			auto x = int(_x / mBlockSize) % Chunk::WIDTH;
