@@ -23,8 +23,8 @@ namespace mc {
 	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData, int distance)
 	{
 		int offset = cameraData.chunkSize * cameraData.blockSize;
-		int x = cameraData.pos.x / offset;
-		int z = cameraData.pos.z / offset;
+		int x = std::floor(cameraData.pos.x / offset);
+		int z = std::floor(cameraData.pos.z / offset);
 		auto nearbyChunks = core::Vector<Chunk*>(0);
 		nearbyChunks.reserve((distance + 1) * (distance + 1));
 		for (auto j = z - distance; j <= z + distance; j++) {
