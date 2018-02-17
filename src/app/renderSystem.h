@@ -256,12 +256,12 @@ namespace mc
 		{
 			ddPush();
 			Aabb aabb;
-			aabb.m_min[0] = std::trunc(selectedBlock.x);
-			aabb.m_min[1] = std::trunc(selectedBlock.y);
-			aabb.m_min[2] = std::trunc(selectedBlock.z);
-			aabb.m_max[0] = std::trunc(selectedBlock.x) + 1.0f;
-			aabb.m_max[1] = std::trunc(selectedBlock.y) + 1.0f;
-			aabb.m_max[2] = std::trunc(selectedBlock.z) + 1.0f;
+			aabb.m_min[0] = std::floor(selectedBlock.x);
+			aabb.m_min[1] = std::floor(selectedBlock.y);
+			aabb.m_min[2] = std::floor(selectedBlock.z);
+			aabb.m_max[0] = std::floor(selectedBlock.x) + 1.0f;
+			aabb.m_max[1] = std::floor(selectedBlock.y) + 1.0f;
+			aabb.m_max[2] = std::floor(selectedBlock.z) + 1.0f;
 			ddSetColor(0xfff0c0ff);
 			ddSetWireframe(true);
 			ddDraw(aabb);

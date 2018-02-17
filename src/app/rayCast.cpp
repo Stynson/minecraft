@@ -26,31 +26,34 @@ namespace mc {
 		auto cameraMaxHorizontalPos = Chunk::WIDTH * std::ceil(mMatrixSize / 2.0f) * mBlockSize;
 		auto cameraMinHorizontalPos = Chunk::WIDTH * std::floor(mMatrixSize / 2.0f) * mBlockSize;
 
-		int xHack = 0;
-		int yHack = 0;
+		//int xHack = 0;
+		//int zHack = 0;
+		glm::vec3 shift(0.0f);
 
 		while (cameraPos.x > cameraMaxHorizontalPos) {
 			cameraPos.x -= Chunk::WIDTH; 
-			xHack -= Chunk::WIDTH;
+			//xHack -= Chunk::WIDTH;
+			shift.x -= Chunk::WIDTH;
 		}
 		while (cameraPos.x < cameraMinHorizontalPos) { 
 			cameraPos.x += Chunk::WIDTH;
-			xHack += Chunk::WIDTH;
+			//xHack += Chunk::WIDTH;
+			shift.x += Chunk::WIDTH;
 		}
 
-		if (cameraPos.y > 0) while (cameraPos.y > Chunk::HEIGHT) cameraPos.y -= Chunk::HEIGHT;
-		else while (cameraPos.y < 0) cameraPos.y += Chunk::HEIGHT;
+		/*if (cameraPos.y > 0) while (cameraPos.y > Chunk::HEIGHT) cameraPos.y -= Chunk::HEIGHT;
+		else while (cameraPos.y < 0) cameraPos.y += Chunk::HEIGHT;*/
 
 		while (cameraPos.z > cameraMaxHorizontalPos) {
 			cameraPos.z -= Chunk::WIDTH;
-			yHack -= Chunk::WIDTH;
+			//zHack -= Chunk::WIDTH;
+			shift.z -= Chunk::WIDTH;
 		}
 		while (cameraPos.z < cameraMinHorizontalPos) {
 			cameraPos.z += Chunk::WIDTH;
-			yHack += Chunk::WIDTH;
+			//zHack += Chunk::WIDTH;
+			shift.z += Chunk::WIDTH;
 		}
-
-		LOG("cam2: %f, %f\n", cameraPos.x, cameraPos.z)
 
 		// Direction to increment x,y,z when stepping.
 		auto step = glm::vec3(
@@ -84,9 +87,9 @@ namespace mc {
 			(step.z > 0 ? cameraPos.z < getWidth() : cameraPos.z >= 0)) {
 
 			drawStepPoints(
-				cameraPos.x - xHack
+				cameraPos.x - shift.x
 				, cameraPos.y
-				, cameraPos.z - yHack);
+				, cameraPos.z - shift.y);
 
 			// Invoke the callback, unless we are not *yet* within the bounds of the
 			// world.
@@ -99,12 +102,13 @@ namespace mc {
 				|| cameraPos.z >= getWidth())
 				)
 			{
-				if (int(getBlock(cameraPos.x, cameraPos.y, cameraPos.z)->type) > 0)
+				Block* selectedBlock = getBlock(cameraPos.x, cameraPos.y, cameraPos.z);
+				if (int(selectedBlock->type) > 0)
 				{
 					return &glm::vec3(
-						cameraPos.x - xHack
+						cameraPos.x - shift.x
 						, cameraPos.y
-						, cameraPos.z - yHack);
+						, cameraPos.z - shift.z);
 				}
 			}
 			// tMaxX stores the t-value at which we cross a cube boundary along the

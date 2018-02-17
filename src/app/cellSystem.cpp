@@ -27,8 +27,8 @@ namespace mc {
 		int z = cameraData.pos.z / offset;
 		auto nearbyChunks = core::Vector<Chunk*>(0);
 		nearbyChunks.reserve((distance + 1) * (distance + 1));
-		for (auto i = x - distance; i <= x + distance; i++) {
-			for (auto j = z - distance; j <= z + distance; j++) {
+		for (auto j = z - distance; j <= z + distance; j++) {
+			for (auto i = x - distance; i <= x + distance; i++) {
 				nearbyChunks.push_back(this->getChunk(i, j));
 			}
 		}

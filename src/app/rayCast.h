@@ -34,10 +34,10 @@ namespace mc
 		int getHeight() const { return Chunk::HEIGHT * mMatrixSize * mBlockSize; }
 
 		Block* getBlock(float _x, float _y, float _z) const {
-			auto x = int(_x / mBlockSize);
+			auto x = int(_x / mBlockSize) % Chunk::WIDTH;
 			auto y = int(_y / mBlockSize);
-			auto z = int(_z / mBlockSize);
-			return &mChunks[int(z / Chunk::WIDTH) * mMatrixSize + int(x / Chunk::WIDTH)]->getBlock(x % Chunk::WIDTH, y, z % Chunk::WIDTH);
+			auto z = int(_z / mBlockSize) % Chunk::WIDTH;
+			return &getChunk(_x, _y, _z)->getBlock(x, y, z);
 		}
 
 		Chunk* getChunk(float _x, float _y, float _z) const {
