@@ -89,7 +89,7 @@ namespace mc {
 			drawStepPoints(
 				cameraPos.x - shift.x
 				, cameraPos.y
-				, cameraPos.z - shift.y);
+				, cameraPos.z - shift.z);
 
 			// Invoke the callback, unless we are not *yet* within the bounds of the
 			// world.
