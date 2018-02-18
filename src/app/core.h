@@ -35,6 +35,8 @@ namespace core
 	using String = std::string;
 
 	float shiftIntoRange(float number, int rangeBegin, int rangeEnd);
+	std::pair<float, int> shiftIntoRangeWithTrack(float number, int rangeBegin, int rangeEnd);
+
 	glm::vec3 worldCoordToBlockCoord(glm::vec3 coord, int offset);
 	glm::vec3 worldCoordToChunkCoord(glm::vec3 coord, int offset);
 

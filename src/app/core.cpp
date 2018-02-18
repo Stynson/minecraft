@@ -14,6 +14,22 @@ namespace core {
 		return number;
 	}
 
+	std::pair<float, int> shiftIntoRangeWithTrack(float number, int rangeBegin, int rangeEnd) {
+		int rangeDistance = rangeEnd - rangeBegin;
+		int shift = 0;
+		while (number > rangeEnd)
+		{
+			number -= rangeDistance;
+			shift -= rangeDistance;
+		}
+		while (number < rangeBegin)
+		{
+			number += rangeDistance;
+			shift += rangeDistance;
+		}
+		return std::pair<float, int>(number, shift);
+	}
+
 	glm::vec3 worldCoordToBlockCoord(glm::vec3 coord, int offset) {
 		coord.x = core::shiftIntoRange(coord.x, 0, offset);
 		coord.z = core::shiftIntoRange(coord.z, 0, offset);
