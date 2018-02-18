@@ -42,13 +42,11 @@ namespace mc
 		int getWidth() const { return Chunk::WIDTH * mMatrixSize * mBlockSize; }
 		int getHeight() const { return Chunk::HEIGHT * mBlockSize; }
 
-		//Block* getBlock(float _x, float _y, float _z) const {
 		Block* getBlock(glm::vec3 worldCoord) const {
-			auto coord = core::worldCoordToBlockCoord(worldCoord, mBlockSize *Chunk::WIDTH);
+			auto coord = core::worldCoordToBlockCoord(worldCoord, mBlockSize * Chunk::WIDTH);
 			return &getChunk(worldCoord)->getBlock(coord.x, coord.y, coord.z);
 		}
 
-		//Chunk* getChunk(float _x, float _y, float _z) const {
 		Chunk* getChunk(glm::vec3 worldCoord) const {
 			auto offset = mBlockSize * Chunk::WIDTH;
 			auto coord = core::worldCoordToChunkCoord(worldCoord, offset);
