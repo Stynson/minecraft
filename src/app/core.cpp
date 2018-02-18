@@ -27,7 +27,7 @@ namespace core {
 			number += rangeDistance;
 			shift += rangeDistance;
 		}
-		return std::pair<float, int>(number, shift);
+		return std::make_pair(number, shift);
 	}
 
 	glm::vec3 worldCoordToBlockCoord(glm::vec3 coord, int offset) {
