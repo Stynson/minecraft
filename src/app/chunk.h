@@ -8,11 +8,11 @@ namespace mc {
 	enum class BlockType : uint8_t
 	{
 		AIR=0
-		, GRASS_DIRT
+		, LEAF
 		, DIRT
 		, COARSE_STONE
-		, LEAF
-		,c
+		, GRASS_DIRT
+		, WATER
 		,d
 		,e
 		,f

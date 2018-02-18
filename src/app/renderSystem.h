@@ -186,15 +186,22 @@ namespace mc
 				auto raycastResult = rc.raycast(mCameraData, 20, debugPoint);
 				if (raycastResult.selected) {
 					drawBlockGizmo(raycastResult.blockCoord);
-					if (mMouseClicked)
+					if (mMouseClicked || rMouseClicked)
 					{
-						mMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;
+						mMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;					
+						rMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Right] == 1;
 					}
 					else
 					{
-						if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) {
+						if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) 
+						{
 							mMouseClicked = true;
 							mCellSystem.setBlockType(BlockType::AIR, raycastResult.blockCoord);
+						}
+						if (m_mouseState.m_buttons[entry::MouseButton::Right] == 1) // place block
+						{
+							rMouseClicked = true;
+							mCellSystem.setBlockType(BlockType::DIRT, (raycastResult.blockCoord + raycastResult.face));
 						}
 					}
 				}
@@ -407,6 +414,7 @@ namespace mc
 		}
 
 		entry::MouseState m_mouseState;
+		entry::MouseState r_mouseState;
 
 		uint32_t m_width;
 		uint32_t m_height;
@@ -439,6 +447,7 @@ namespace mc
 
 		float frustrumFarDistance;
 		bool mMouseClicked = false;
+		bool rMouseClicked = false;
 	};
 
 
