@@ -34,4 +34,8 @@ namespace core
 	using Set = std::set<T>;
 	using String = std::string;
 
+	float shiftIntoRange(float number, int rangeBegin, int rangeEnd);
+	glm::vec3 worldCoordToBlockCoord(glm::vec3 coord, int offset);
+	glm::vec3 worldCoordToChunkCoord(glm::vec3 coord, int offset);
+
 }
