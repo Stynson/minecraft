@@ -106,9 +106,9 @@ namespace mc {
 				if (int(selectedBlock->type) > 0)
 				{
 					return &glm::vec3(
-						cameraPos.x - shift.x
+						cameraPos.x 
 						, cameraPos.y
-						, cameraPos.z - shift.z);
+						, cameraPos.z );
 				}
 			}
 			// tMaxX stores the t-value at which we cross a cube boundary along the

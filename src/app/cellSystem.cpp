@@ -9,15 +9,13 @@ namespace mc {
 		auto it = mMap.find(key);
 		if (it == mMap.end())
 		{
-			mMap.insert(it, std::make_pair(key, std::move(mGenerator.generate(x, z))));
+			return mMap.insert(it, std::make_pair(key, std::move(mGenerator.generate(x, z))))->second.get(); 
 		}
-		return mMap[key].get();
+		return it->second.get();
 	}
 
 	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData) {
-		auto distance = cameraData.viewDistance;
-		return getNearbyChunks(cameraData, distance);
-
+		return getNearbyChunks(cameraData, cameraData.viewDistance); 
 	}
 
 	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData, int distance)

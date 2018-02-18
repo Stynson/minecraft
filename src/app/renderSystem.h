@@ -185,7 +185,12 @@ namespace mc
 				auto selectedBlock = rc.raycast(mCameraData, 20, debugPoint);
 				if (selectedBlock != nullptr) {
 					drawBlockGizmo(*selectedBlock);
+					if (m_mouseState.m_buttons[entry::MouseButton::Left])
+					{ 
+						mCellSystem.setBlock(*selectedBlock, BlockType::AIR);
+					}
 				}
+
 
 				startRender();
 				//renderSkybox();
