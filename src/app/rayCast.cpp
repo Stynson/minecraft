@@ -2,7 +2,7 @@
 
 namespace mc {
 
-	glm::vec3* RayCast::raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) const {
+	RayCast::RayCastResult RayCast::raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) const {
 		// From "A Fast Voxel Traversal Algorithm for Ray Tracing"
 		// by John Amanatides and Andrew Woo, 1987
 		// <http://www.cse.yorku.ca/~amana/research/grid.pdf>
@@ -71,6 +71,7 @@ namespace mc {
 			step.x / direction.x / mPrecision
 			, step.y / direction.y / mPrecision
 			, step.z / direction.z / mPrecision);
+		auto face = glm::vec3(0.0f);
 
 		// Avoids an infinite loop.
 		//if (dx === 0 && dy == = 0 && dz === 0)
@@ -105,10 +106,11 @@ namespace mc {
 				Block* selectedBlock = getBlock(cameraPos.x, cameraPos.y, cameraPos.z);
 				if (int(selectedBlock->type) > 0)
 				{
-					return &glm::vec3(
-						cameraPos.x 
+					auto selectedBlockCoord = glm::vec3(
+						cameraPos.x - shift.x
 						, cameraPos.y
-						, cameraPos.z );
+						, cameraPos.z - shift.z);
+					return RayCastResult(selectedBlockCoord, face);
 				}
 			}
 			// tMaxX stores the t-value at which we cross a cube boundary along the
@@ -124,12 +126,18 @@ namespace mc {
 					cameraPos.x += step.x;
 					// Adjust tMaxX to the next X-oriented boundary crossing.
 					tMax.x += tDelta.x;
+					face.x = -step.x;
+					face.y = 0;
+					face.z = 0;
 				}
 				else
 				{
 					if (tMax.z > radius) break;
 					cameraPos.z += step.z;
 					tMax.z += tDelta.z;
+					face.x = 0;
+					face.y = 0;
+					face.z = -step.z;
 				}
 			}
 			else
@@ -139,6 +147,9 @@ namespace mc {
 					if (tMax.y > radius) break;
 					cameraPos.y += step.y;
 					tMax.y += tDelta.y;
+					face.x = 0;
+					face.y = -step.y;
+					face.z = 0;
 				}
 				else
 				{
@@ -147,10 +158,13 @@ namespace mc {
 					if (tMax.z > radius) break;
 					cameraPos.z += step.z;
 					tMax.z += tDelta.z;
+					face.x = 0;
+					face.y = 0;
+					face.z = -step.z;
 				}
 			}
 		}
-		return nullptr;
+		return RayCastResult();
 	}
 
 	float RayCast::intbound(float s, float ds) const {
