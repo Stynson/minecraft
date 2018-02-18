@@ -21,8 +21,8 @@ namespace mc {
 	core::Vector<Chunk*> CellSystem::getNearbyChunks(const CameraData& cameraData, int distance)
 	{
 		int offset = cameraData.chunkSize * cameraData.blockSize;
-		int x = cameraData.pos.x / offset;
-		int z = cameraData.pos.z / offset;
+		int x = std::floor(cameraData.pos.x / offset);
+		int z = std::floor(cameraData.pos.z / offset);
 		auto nearbyChunks = core::Vector<Chunk*>(0);
 		nearbyChunks.reserve((distance + 1) * (distance + 1));
 		for (auto j = z - distance; j <= z + distance; j++) {
@@ -31,6 +31,24 @@ namespace mc {
 			}
 		}
 		return nearbyChunks;
+	}
+
+	void CellSystem::setBlockType(BlockType type, glm::vec3 worldCoord)
+	{
+		int offset = Chunk::WIDTH * 1;
+		int chunkX = std::floor(worldCoord.x / offset);
+		int chunkZ = std::floor(worldCoord.z / offset);
+		Chunk* currentChunk = getChunk(chunkX, chunkZ);
+
+		auto blockX = worldCoord.x;
+		auto blockZ = worldCoord.z;
+		while (blockX > Chunk::WIDTH) blockX -= Chunk::WIDTH;
+		while (blockX < Chunk::WIDTH) blockX += Chunk::WIDTH;
+		while (blockZ > Chunk::WIDTH) blockZ -= Chunk::WIDTH;
+		while (blockZ < Chunk::WIDTH) blockZ += Chunk::WIDTH;
+		blockX = std::floor(std::fmod(blockX, offset));
+		blockZ = std::floor(std::fmod(blockZ, offset));
+		currentChunk->setBlockType(type, blockX, worldCoord.y, blockZ);
 	}
 
 }
