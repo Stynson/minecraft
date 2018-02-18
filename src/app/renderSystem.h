@@ -199,6 +199,7 @@ namespace mc
 					}
 				}
 
+
 				startRender();
 				//renderSkybox();
 
