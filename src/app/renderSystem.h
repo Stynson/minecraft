@@ -183,10 +183,9 @@ namespace mc
 
 				auto nearChunks = mCellSystem.getNearbyChunks(mCameraData, 1);
 				RayCast rc(nearChunks);
-				auto selectedBlock = rc.raycast(mCameraData, 20, debugPoint);
-				if (selectedBlock != nullptr) {
-					glm::vec3 block(*selectedBlock);
-					drawBlockGizmo(*selectedBlock);
+				auto raycastResult = rc.raycast(mCameraData, 20, debugPoint);
+				if (raycastResult.selected) {
+					drawBlockGizmo(raycastResult.blockCoord);
 					if (mMouseClicked)
 					{
 						mMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;
@@ -195,7 +194,7 @@ namespace mc
 					{
 						if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) {
 							mMouseClicked = true;
-							mCellSystem.setBlockType(BlockType::AIR, glm::vec3(block));
+							mCellSystem.setBlockType(BlockType::AIR, raycastResult.blockCoord);
 						}
 					}
 				}

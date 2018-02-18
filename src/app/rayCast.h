@@ -13,12 +13,21 @@ namespace mc
 
 	class RayCast {
 	public:
+		struct RayCastResult {
+			glm::vec3 blockCoord;
+			glm::vec3 face;
+			bool selected = false;
+
+			RayCastResult(){};
+			RayCastResult(glm::vec3 _coord, glm::vec3 _face) : blockCoord(_coord), face(_face), selected(true) {};
+		};
+
 		RayCast(core::Vector<Chunk*> chunks) : mChunks(chunks), mPrecision(0.1f)
 		{
 			mMatrixSize = std::sqrt(chunks.size());
 		}
 
-		glm::vec3* raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) const;
+		RayCast::RayCastResult raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) const;
 
 	private:
 		core::Vector<Chunk*> mChunks;
