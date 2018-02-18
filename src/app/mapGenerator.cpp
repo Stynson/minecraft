@@ -25,17 +25,36 @@ namespace mc
 				float average = std::accumulate(heights.begin(), heights.end(), 0.0) / heights.size();
 				average -= floor(average);
 				average *= Chunk::HEIGHT;
-				for (auto l = (i*num); l < (i * num + num); l++)
+				if (average < 8)
 				{
-					for (auto m = (j * num); m < (j * num + num); m++)
+					for (auto l = (i*num); l < (i * num + num); l++)
 					{
-						//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
-						//height -= floor(height);
-						for (auto y = 0; y < average - 1; y++)
+						for (auto m = (j * num); m < (j * num + num); m++)
 						{
-							chunk->setBlockType(BlockType::DIRT, l, y, m);
+							//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
+							//height -= floor(height);
+							for (auto y = 0; y < average; y++)
+							{
+								chunk->setBlockType(BlockType::WATER, l, y, m);
+							}
+							//chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
 						}
-						chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
+					}
+				}
+				else
+				{
+					for (auto l = (i*num); l < (i * num + num); l++)
+					{
+						for (auto m = (j * num); m < (j * num + num); m++)
+						{
+							//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
+							//height -= floor(height);
+							for (auto y = 0; y < average - 1; y++)
+							{
+								chunk->setBlockType(BlockType::DIRT, l, y, m);
+							}
+							chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
+						}
 					}
 				}
 			}
