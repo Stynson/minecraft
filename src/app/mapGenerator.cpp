@@ -85,9 +85,9 @@ namespace mc
 			{
 				chunk.setBlockType(BlockType::TREE, i, z, j);
 			}
-			int decrease = 3;
-			int increase = 4;
-			for (; height + 5 < Chunk::HEIGHT; height++)
+			int decrease = 2;
+			int increase = 5;
+			for (int iter = 0; iter < 2; iter++)
 			{
 				for (int z = i - decrease; z < i + decrease + 1; z++)
 				{
@@ -96,8 +96,26 @@ namespace mc
 						chunk.setBlockType(BlockType::LEAF, z, height + 5, q);
 					}
 				}
-				decrease--;
+					//decrease--;
+				height++;
 			}
+			for (int z = i - (--decrease); z < i + decrease + 1; z++)
+			{
+				for (int q = j - decrease; q < j + decrease + 1; q++)
+				{
+					chunk.setBlockType(BlockType::LEAF, z, height + 5, q);
+				}
+			}
+			chunk.setBlockType(BlockType::LEAF, i - decrease + 1, height + 6, j - decrease);
+			chunk.setBlockType(BlockType::LEAF, i - decrease, height + 6, j - decrease + 1);
+			chunk.setBlockType(BlockType::LEAF, i - decrease + 1, height + 6, j - decrease + 2);
+			chunk.setBlockType(BlockType::LEAF, i - decrease + 2, height + 6, j - decrease + 1);
+			chunk.setBlockType(BlockType::LEAF, i, height + 6, j);
+			for (int z = height; z < height + 6; z++)
+			{
+				chunk.setBlockType(BlockType::TREE, i, z, j);
+			}
+
 		}
 
 	}
