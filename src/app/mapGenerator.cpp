@@ -12,7 +12,6 @@ namespace mc
 	std::unique_ptr<Chunk> MapGenerator::generate(int x, int z) const
 	{
 		auto chunk = std::make_unique<Chunk>(x, z);
-		double height;
 		for (auto i = 0; i < Chunk::WIDTH / num; i++)
 		{
 			for (auto j = 0; j < Chunk::WIDTH / num; j++)
@@ -75,7 +74,7 @@ namespace mc
 				i = 5;
 				j = 5;
 			}
-			double height;
+			int height;
 			for (int z = 0; chunk.getBlock(i, z, j).type != BlockType::AIR; z++)
 			{
 				height = z;

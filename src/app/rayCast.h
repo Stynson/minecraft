@@ -24,7 +24,7 @@ namespace mc
 
 		RayCast(core::Vector<Chunk*> chunks) : mChunks(chunks), mPrecision(0.1f)
 		{
-			mMatrixSize = std::sqrt(chunks.size());
+			mMatrixSize = static_cast<int>(std::sqrt(chunks.size()));
 		}
 
 		RayCast::RayCastResult raycast(const CameraData& cameraData, float radius, void(*drawStepPoints)(float, float, float)) const;
