@@ -11,6 +11,7 @@ namespace mc
 		, COARSE_STONE
 		, LEAF
 		, TREE
+		, WATER
 	};
 
 	struct Block
@@ -69,6 +70,6 @@ namespace mc
 		}
 	private:
 
-		static std::array<BlockDescriptor, 6> blockDescriptors;
+		static std::array<BlockDescriptor, 7> blockDescriptors;
 	};
 }
