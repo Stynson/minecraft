@@ -26,34 +26,14 @@ namespace mc {
 		auto cameraMaxHorizontalPos = Chunk::WIDTH * std::ceil(mMatrixSize / 2.0f) * mBlockSize;
 		auto cameraMinHorizontalPos = Chunk::WIDTH * std::floor(mMatrixSize / 2.0f) * mBlockSize;
 
-		//int xHack = 0;
-		//int zHack = 0;
 		glm::vec3 shift(0.0f);
+		auto shifted = core::shiftIntoRangeWithTrack(cameraPos.x, cameraMinHorizontalPos, cameraMaxHorizontalPos);
+		cameraPos.x = shifted.first;
+		shift.x = shifted.second;
 
-		while (cameraPos.x > cameraMaxHorizontalPos) {
-			cameraPos.x -= Chunk::WIDTH; 
-			//xHack -= Chunk::WIDTH;
-			shift.x -= Chunk::WIDTH;
-		}
-		while (cameraPos.x < cameraMinHorizontalPos) { 
-			cameraPos.x += Chunk::WIDTH;
-			//xHack += Chunk::WIDTH;
-			shift.x += Chunk::WIDTH;
-		}
-
-		/*if (cameraPos.y > 0) while (cameraPos.y > Chunk::HEIGHT) cameraPos.y -= Chunk::HEIGHT;
-		else while (cameraPos.y < 0) cameraPos.y += Chunk::HEIGHT;*/
-
-		while (cameraPos.z > cameraMaxHorizontalPos) {
-			cameraPos.z -= Chunk::WIDTH;
-			//zHack -= Chunk::WIDTH;
-			shift.z -= Chunk::WIDTH;
-		}
-		while (cameraPos.z < cameraMinHorizontalPos) {
-			cameraPos.z += Chunk::WIDTH;
-			//zHack += Chunk::WIDTH;
-			shift.z += Chunk::WIDTH;
-		}
+		shifted = core::shiftIntoRangeWithTrack(cameraPos.z, cameraMinHorizontalPos, cameraMaxHorizontalPos);
+		cameraPos.z = shifted.first;
+		shift.z = shifted.second;
 
 		// Direction to increment x,y,z when stepping.
 		auto step = glm::vec3(
@@ -103,7 +83,7 @@ namespace mc {
 				|| cameraPos.z >= getWidth())
 				)
 			{
-				Block* selectedBlock = getBlock(cameraPos.x, cameraPos.y, cameraPos.z);
+				Block* selectedBlock = getBlock(cameraPos);
 				if (int(selectedBlock->type) > 0)
 				{
 					auto selectedBlockCoord = glm::vec3(

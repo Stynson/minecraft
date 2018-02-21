@@ -42,17 +42,15 @@ namespace mc
 		int getWidth() const { return Chunk::WIDTH * mMatrixSize * mBlockSize; }
 		int getHeight() const { return Chunk::HEIGHT * mBlockSize; }
 
-		Block* getBlock(float _x, float _y, float _z) const {
-			auto x = int(_x / mBlockSize) % Chunk::WIDTH;
-			auto y = int(_y / mBlockSize);
-			auto z = int(_z / mBlockSize) % Chunk::WIDTH;
-			return &getChunk(_x, _y, _z)->getBlock(x, y, z);
+		Block* getBlock(glm::vec3 worldCoord) const {
+			auto coord = core::worldCoordToBlockCoord(worldCoord, mBlockSize * Chunk::WIDTH);
+			return &getChunk(worldCoord)->getBlock(coord.x, coord.y, coord.z);
 		}
 
-		Chunk* getChunk(float _x, float _y, float _z) const {
-			auto x = int(_x / mBlockSize / Chunk::WIDTH);
-			auto z = int(_z / mBlockSize / Chunk::WIDTH);
-			return mChunks[z * mMatrixSize + x];
+		Chunk* getChunk(glm::vec3 worldCoord) const {
+			auto offset = mBlockSize * Chunk::WIDTH;
+			auto coord = core::worldCoordToChunkCoord(worldCoord, offset);
+			return mChunks[coord.z * mMatrixSize + coord.x];
 		}
 	};
 

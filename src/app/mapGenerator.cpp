@@ -25,17 +25,36 @@ namespace mc
 				float average = std::accumulate(heights.begin(), heights.end(), 0.0) / heights.size();
 				average -= floor(average);
 				average *= Chunk::HEIGHT;
-				for (auto l = (i*num); l < (i * num + num); l++)
+				if (average < 8)
 				{
-					for (auto m = (j * num); m < (j * num + num); m++)
+					for (auto l = (i*num); l < (i * num + num); l++)
 					{
-						//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
-						//height -= floor(height);
-						for (auto y = 0; y < average - 1; y++)
+						for (auto m = (j * num); m < (j * num + num); m++)
 						{
-							chunk->setBlockType(BlockType::DIRT, l, y, m);
+							//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
+							//height -= floor(height);
+							for (auto y = 0; y < average; y++)
+							{
+								chunk->setBlockType(BlockType::WATER, l, y, m);
+							}
+							//chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
 						}
-						chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
+					}
+				}
+				else
+				{
+					for (auto l = (i*num); l < (i * num + num); l++)
+					{
+						for (auto m = (j * num); m < (j * num + num); m++)
+						{
+							//height = mPerlinNoise.noise(chunk->getX() + l, chunk->getZ() + m, -0.2);
+							//height -= floor(height);
+							for (auto y = 0; y < average - 1; y++)
+							{
+								chunk->setBlockType(BlockType::DIRT, l, y, m);
+							}
+							chunk->setBlockType(BlockType::GRASS_DIRT, l, average, m);
+						}
 					}
 				}
 			}
@@ -66,9 +85,9 @@ namespace mc
 			{
 				chunk.setBlockType(BlockType::TREE, i, z, j);
 			}
-			int decrease = 3;
-			int increase = 4;
-			for (; height + 5 < Chunk::HEIGHT; height++)
+			int decrease = 2;
+			int increase = 5;
+			for (int iter = 0; iter < 2; iter++)
 			{
 				for (int z = i - decrease; z < i + decrease + 1; z++)
 				{
@@ -77,8 +96,26 @@ namespace mc
 						chunk.setBlockType(BlockType::LEAF, z, height + 5, q);
 					}
 				}
-				decrease--;
+					//decrease--;
+				height++;
 			}
+			for (int z = i - (--decrease); z < i + decrease + 1; z++)
+			{
+				for (int q = j - decrease; q < j + decrease + 1; q++)
+				{
+					chunk.setBlockType(BlockType::LEAF, z, height + 5, q);
+				}
+			}
+			chunk.setBlockType(BlockType::LEAF, i - decrease + 1, height + 6, j - decrease);
+			chunk.setBlockType(BlockType::LEAF, i - decrease, height + 6, j - decrease + 1);
+			chunk.setBlockType(BlockType::LEAF, i - decrease + 1, height + 6, j - decrease + 2);
+			chunk.setBlockType(BlockType::LEAF, i - decrease + 2, height + 6, j - decrease + 1);
+			chunk.setBlockType(BlockType::LEAF, i, height + 6, j);
+			for (int z = height; z < height + 6; z++)
+			{
+				chunk.setBlockType(BlockType::TREE, i, z, j);
+			}
+
 		}
 
 	}

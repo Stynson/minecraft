@@ -4,8 +4,7 @@
 #include "block.h"
 #include "core.h"
 
-namespace mc {
-
+namespace mc { 
 
 	class Chunk 
 	{
