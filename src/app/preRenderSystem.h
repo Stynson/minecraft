@@ -62,15 +62,15 @@ namespace mc
 		{ 0.5f, -0.5f, -0.5f,  encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  atlasIndex, atlasIndex },
 		{ -0.5f, -0.5f, -0.5f, encodeNormalRgba8(0.0f,  0.0f, -1.0f), 0,  0, atlasIndex },
 		// LEFT
-		{ -0.5f,  0.5f, -0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, atlasIndex },
+		{ -0.5f,  0.5f, -0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0},
 		{ -0.5f,  0.5f,  0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, 0 },
 		{ -0.5f, -0.5f, -0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, atlasIndex },
-		{ -0.5f, -0.5f,  0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, 0, 0 },
+		{ -0.5f, -0.5f,  0.5f, encodeNormalRgba8(-1.0f,  0.0f,  0.0f), 0, atlasIndex, atlasIndex },
 		// RIGHT
-		{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, 0 },
-		{ 0.5f,  0.5f, -0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, atlasIndex },
-		{ 0.5f, -0.5f,  0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0 },
-		{ 0.5f, -0.5f, -0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, atlasIndex },
+		{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, 0},
+		{ 0.5f,  0.5f, -0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, 0 },
+		{ 0.5f, -0.5f,  0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  0, atlasIndex },
+		{ 0.5f, -0.5f, -0.5f,  encodeNormalRgba8(1.0f,  0.0f,  0.0f), 0,  atlasIndex, atlasIndex },
 		// UP
 		//{ 0.5f,  0.5f,  0.5f,  encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  atlasIndex, 0 },
 		//{ -0.5f,  0.5f,  0.5f, encodeNormalRgba8(0.0f,  1.0f,  0.0f), 0,  0, 0 },
@@ -134,15 +134,6 @@ namespace mc
 	*
 	* */
 
-	enum class Side : uint8_t
-	{
-		BACK = 0
-		, FRONT
-		, LEFT
-		, RIGHT
-		, UP
-		, DOWN
-	};
 
 	static uint16_t textJump = 2048;
 	static uint8_t blockPerRow = 16;
@@ -172,7 +163,8 @@ namespace mc
 		bgfx::VertexBufferHandle vbh;
 		bgfx::IndexBufferHandle ibh;
 
-		void addVertices(Side side, int x, int y, int z, int blockIndex) {
+		void addVertices(Side side, int x, int y, int z, BlockType blockType) {
+			int blockIndex = BlockDescriptors::getBlockIndex(blockType, side);
 			uint8_t vBegin = 4 * (int)side;
 			for (auto i = vBegin; i < vBegin + 4; i++)
 			{
@@ -308,29 +300,29 @@ namespace mc
 						{
 							if (x == 0 || chunk->isBlockType(BlockType::AIR, x - 1, y, z))
 							{
-								m->addVertices(Side::LEFT, x, y, z, (int)block.type-1);
+								m->addVertices(Side::LEFT, x, y, z, block.type);
 							}
 							if (x == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x + 1, y, z))
 							{
-								m->addVertices(Side::RIGHT, x, y, z, (int)block.type-1);
+								m->addVertices(Side::RIGHT, x, y, z, block.type);
 							}
 
 							if (y == 0 || chunk->isBlockType(BlockType::AIR, x, y - 1, z))
 							{
-								m->addVertices(Side::DOWN, x, y, z, (int)block.type-1);
+								m->addVertices(Side::DOWN, x, y, z, block.type);
 							}
 							if (y == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y + 1, z))
 							{
-								m->addVertices(Side::UP, x, y, z, (int)block.type-1);
+								m->addVertices(Side::UP, x, y, z, block.type);
 							}
 
 							if (z == 0 || chunk->isBlockType(BlockType::AIR, x, y, z - 1))
 							{
-								m->addVertices(Side::FRONT, x, y, z, (int)block.type-1);
+								m->addVertices(Side::FRONT, x, y, z, block.type);
 							}
 							if (z == (Chunk::WIDTH - 1) || chunk->isBlockType(BlockType::AIR, x, y, z + 1))
 							{
-								m->addVertices(Side::BACK, x, y, z, (int)block.type-1);
+								m->addVertices(Side::BACK, x, y, z, block.type);
 							}
 						}
 					}

@@ -1,41 +1,11 @@
 #pragma once
 
 #include <array>
+#include "block.h"
 #include "core.h"
 
 namespace mc {
 
-	enum class BlockType : uint8_t
-	{
-		AIR=0
-		, GRASS_DIRT
-		, DIRT
-		, COARSE_STONE
-		, LEAF
-		,c
-		,d
-		,e
-		,f
-		,g, ZYS, XRY, KYU, BCH, LIX
-		, VIJ, HDH, PKS, PJE, ULG, KOT
-		, TREE
-		, CEY, YPB, JOK, SYR, PUO, SOO, XQR, LBN, LOO, OGO, IGC, XIZ, JHY, OIH, FBF, AWX, UUX, EWO, KXT, WMI, HWC, WAK, FKB, OKL, CJW, QFK, OSD, TXM, USW, DHZ, USY, MAI, SQT, GET, RSW, KEE, PVM, CBN, JPU, FQD, HVW, LDK, VOI, RKA, WHT, FUS, AEO, LZV, PZQ, SCG, WAX, BVU, YON, BUI, GZG, XHT, PES, HWH, GWW, ARC, OZB, WRF, QNU, HHE, HXN, WWN
-	};
-
-	struct Block
-	{
-		BlockType type = BlockType::AIR;
-		uint8_t orientation = 0;
-
-		Block() = default;
-		Block(BlockType _type) : type(type), orientation(0) {}
-		Block(BlockType _type, uint8_t _orientation) : type(_type), orientation(_orientation) {}
-		Block(Block const&) = default;
-		Block(Block &&) = default;
-
-		Block& operator=(Block const&) = default;
-		Block& operator=(Block &&) = default;
-	};
 
 	class Chunk 
 	{
