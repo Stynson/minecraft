@@ -1,5 +1,6 @@
 #include "core.h"
 #include "chunk.h"
+#include <cmath>
 
 namespace core {
 	
