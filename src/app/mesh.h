@@ -1,30 +1,26 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <algorithm>
-#include "chunk.h"
-#include "cullingSystem.h"
-#include "cameraData.h"
-#include "core.h"
-
-
-#include "common.h"
-#include "bgfx_utils.h"
-#include "imgui/imgui.h"
-#include "camera.h"
-#include "bounds.h"
-
-#include <bx/allocator.h>
-#include <bx/debug.h>
-#include <bx/math.h>
-#include <bx/rng.h>
-#include <bgfx/bgfx.h>
-
-<<<<<<< HEAD
 namespace mc
 {
+	/**
+	*         VERTEX NUMBER/NAMES
+	*
+	*         (-1,1,1)    0(LUF)         1(RUF) (1,1,1)
+	*                       *--------------*
+	*         (-1,1,-1)    /|             /|
+	*   y           4(LUB)/ |      5(RUB)/ | (1,1,-1)
+	*   |                *--------------*  |
+	*   |                |  |           |  |
+	*   |_____ x         |  | (-1,-1,1) |  |
+	*   /                |  |2(LLF)     |  |
+	*  /                 |  *-----------|--*3(RLF) (1,-1,1)
+	*   -z               | /            | /
+	*         (-1,-1,-1) |/             |/
+	*              6(LLB)*--------------*7(RLB) (1,-1,-1)
+	*
+	* */
+
+
 	struct PosNormalTangentTexcoordVertex
 	{
 		float m_x;
@@ -84,57 +80,8 @@ namespace mc
 		{ -0.5f, -0.5f,  0.5f, encodeNormalRgba8(0.0f, -1.0f,  0.0f), 0,  0, 0 },
 	};
 
-	static const uint16_t s_cubeFaceIndices[24] =
-	{
-		0,  2,  1,  3,
-		4,  6,  5,  7,
-
-		8,  10,  9, 11,
-		12, 14, 13, 15,
-
-		16, 18, 17, 19,
-		20, 22, 21, 23
-	};
-	static const uint16_t s_cubeIndices[36] =
-	{
-		0,  2,  1,
-		1,  2,  3,
-		4,  5,  6,
-		5,  7,  6,
-
-		8, 10,  9,
-		9, 10, 11,
-		12, 13, 14,
-		13, 15, 14,
-
-		16, 18, 17,
-		17, 18, 19,
-		20, 21, 22,
-		21, 23, 22,
-	};
-
-	/**
-	*         VERTEX NUMBER/NAMES
-	*
-	*         (-1,1,1)    0(LUF)         1(RUF) (1,1,1)
-	*                       *--------------*
-	*         (-1,1,-1)    /|             /|
-	*   y           4(LUB)/ |      5(RUB)/ | (1,1,-1)
-	*   |                *--------------*  |
-	*   |                |  |           |  |
-	*   |_____ x         |  | (-1,-1,1) |  |
-	*   /                |  |2(LLF)     |  |
-	*  /                 |  *-----------|--*3(RLF) (1,-1,1)
-	*   -z               | /            | /
-	*         (-1,-1,-1) |/             |/
-	*              6(LLB)*--------------*7(RLB) (1,-1,-1)
-	*
-	* */
-
-
-	static uint16_t textJump = 2048;
-	static uint8_t blockPerRow = 16;
-
+    //TODO to class and use c++17
+    static uint8_t blockPerRow = 16;
 	struct Mesh
 	{
 		int x = 0;
@@ -235,32 +182,10 @@ namespace mc
 				| BGFX_STATE_DEPTH_TEST_LESS
 				| BGFX_STATE_MSAA
 				| BGFX_STATE_CULL_CW
-				| BGFX_STATE_BLEND_ALPHA
 			);
 			bgfx::submit(id, program);
 		}
 
 
-	};
-=======
-#include "mesh.h"
->>>>>>> 43f0a9e3034747384b2a6a297a55a378bf825b25
-
-namespace mc
-{ 
-	class PreRenderSystem
-	{
-	public:
-		PreRenderSystem(CullingSystem& cullingSystem)
-			:mCullingSystem(cullingSystem)
-		{}
-		std::vector<Mesh*> getMeshes(const CameraData& cameraData);
-	private:
-		std::unique_ptr<Mesh> bakeMesh(Chunk* chunk);
-
-		CullingSystem& mCullingSystem;
-		core::Vector<core::String> mOldChunks;
-		using MeshMap = core::Map<core::String, std::pair<size_t, std::unique_ptr<Mesh>>>;
-		MeshMap mOldMeshes;
 	};
 }

@@ -83,8 +83,8 @@ namespace mc {
 				|| cameraPos.z >= getWidth())
 				)
 			{
-				Block* selectedBlock = getBlock(cameraPos);
-				if (int(selectedBlock->type) > 0)
+				Block selectedBlock = getBlock(cameraPos);
+				if (int(selectedBlock.type) > 0)
 				{
 					auto selectedBlockCoord = glm::vec3(
 						cameraPos.x - shift.x

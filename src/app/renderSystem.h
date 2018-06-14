@@ -16,215 +16,32 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <debugdraw/debugdraw.h>
-
-static void debugPoint(float x, float y, float z) {
-	ddPush();
-	Sphere sphere = { { x, y, z }, 0.01f };
-	//ddSetColor(0x3f50ffff);
-	ddSetColor(0xA52A2AFF);
-	ddSetWireframe(false);
-	ddDraw(sphere);
-	ddPop();
-}
+#include <debugdraw/debugdraw.h> 
 
 namespace mc
 {
-	inline glm::tmat4x4<float, glm::defaultp> perspective(float fovy, float aspect, float zNear, float zFar)
-	{
-		glm::tmat4x4<float, glm::defaultp> mtx;
-		//Dunno why this works this way...
-#	if GLM_COORDINATE_SYSTEM != GLM_LEFT_HANDED
-		bx::mtxProjLh(&mtx[0][0], glm::degrees(fovy), aspect, zNear, zFar, bgfx::getCaps()->homogeneousDepth);
-#	else
-		bx::mtxProjRh(&mtx[0][0], glm::degrees(fovy), aspect, zNear, zFar, bgfx::getCaps()->homogeneousDepth);
-#	endif
-		return mtx;
-	}
-
-	class ExampleCubes : public entry::AppI
+	class App : public entry::AppI
 	{
 	public:
-		ExampleCubes(const char* _name, const char* _description)
+		App(const char* _name, const char* _description)
 			: entry::AppI(_name, _description)
 		{
 		}
+    protected: 
+		void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override; 
+		virtual int shutdown() override; 
+		bool update() override; 
+		void setupDebugWindow();
 
-		void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
-		{
+		void drawChunkGizmos(); 
+		void drawBlockGizmo(glm::vec3 selectedBlock); 
 
-			Args args(_argc, _argv);
+		void startRender();
+		void endRender();
 
-			m_width = _width;
-			m_height = _height;
-			m_debug = BGFX_DEBUG_NONE;
-			m_reset = BGFX_RESET_VSYNC;
+		void drawPoint(const CameraData& cameraData);
 
-
-			bgfx::init(args.m_type, args.m_pciId);
-			bgfx::reset(m_width, m_height, m_reset);
-
-			// Enable debug text.
-			bgfx::setDebug(m_debug);
-
-			// Set view 0 clear state.
-			bgfx::setViewClear(0
-				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-				, 0x87ceebff
-				, 1.0f
-				, 0
-			);
-
-			// Create vertex stream declaration.
-			PosNormalTangentTexcoordVertex::init();
-
-			// Create texture sampler uniforms.
-			s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
-
-			// Create program from shaders.
-			m_program = loadProgram("vs_cubes", "fs_cubes");
-			// Load diffuse texture.
-			m_textureColor = loadTexture("textures/terrain.png", BGFX_TEXTURE_MAG_POINT);
-
-			//m_skybox = loadTexture("textures/fieldstone-rgba.dds");
-			m_skybox = loadTexture("textures/skybox.dds");
-
-			core::Vector<PosNormalTangentTexcoordVertex> skyboxVert;
-			core::Vector<uint16_t> skyboxIndices;
-			for (auto i = 0; i < 24; i++)
-			{
-				PosNormalTangentTexcoordVertex clone = s_cubeVertices[i];
-				clone.m_x += 2;
-				clone.m_y += 2;
-				clone.m_z += 2;
-				skyboxVert.push_back(clone);
-			}
-			for (auto i = 0; i < 6; i++)
-			{
-				skyboxIndices.push_back(i * 4 + 0);
-				skyboxIndices.push_back(i * 4 + 1);
-				skyboxIndices.push_back(i * 4 + 2);
-				skyboxIndices.push_back(i * 4 + 2);
-				skyboxIndices.push_back(i * 4 + 1);
-				skyboxIndices.push_back(i * 4 + 3);
-			}
-			auto vMem = bgfx::copy(skyboxVert.data(), sizeof(skyboxVert[0])*skyboxVert.size());
-			skyboxVbh = bgfx::createVertexBuffer(vMem, PosNormalTangentTexcoordVertex::ms_decl);
-			skyboxVert.clear();
-
-			auto iMem = bgfx::copy(skyboxIndices.data(), sizeof(skyboxIndices[0])*skyboxIndices.size());
-			skyboxIbh = bgfx::createIndexBuffer(iMem);
-			skyboxIndices.clear();
-
-			m_timeOffset = bx::getHPCounter();
-
-			ddInit();
-
-			imguiCreate();
-
-			frustrumFarDistance = 200.0f;
-			cameraCreate();
-
-			const float initialPos[3] = { 5.0f, 20.0, 0.0f };
-			cameraSetPosition(initialPos);
-			cameraSetVerticalAngle(bx::kPi / 8.0f);
-			cameraSetHorizontalAngle(-bx::kPi / 3.0f);
-
-		}
-
-		virtual int shutdown() override
-		{
-			cameraDestroy();
-			imguiDestroy();
-
-			// Cleanup.
-			bgfx::destroy(m_program);
-
-			// Shutdown bgfx.
-			bgfx::shutdown();
-
-			return 0;
-		}
-
-		bool update() override
-		{
-			if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState))
-			{
-				int64_t now = bx::getHPCounter();
-				static int64_t last = now;
-				const int64_t frameTime = now - last;
-				last = now;
-				const double freq = double(bx::getHPFrequency());
-				const float deltaTime = float(frameTime / freq);
-
-				imguiBeginFrame(m_mouseState.m_mx
-					, m_mouseState.m_my
-					, (m_mouseState.m_buttons[entry::MouseButton::Left] ? IMGUI_MBUT_LEFT : 0)
-					| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
-					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-					, m_mouseState.m_mz
-					, uint16_t(m_width)
-					, uint16_t(m_height)
-				);
-
-				showExampleDialog(this);
-
-
-				setupDebugWindow();
-
-				imguiEndFrame();
-
-				float time = (float)((bx::getHPCounter() - m_timeOffset) / double(bx::getHPFrequency()));
-
-				updateCamera(deltaTime);
-				// This dummy draw call is here to make sure that view 0 is cleared
-				// if no other draw calls are submitted to view 0.
-				bgfx::touch(0);
-
-				auto nearChunks = mCellSystem.getNearbyChunks(mCameraData, 1);
-				RayCast rc(nearChunks);
-				auto raycastResult = rc.raycast(mCameraData, 20, debugPoint);
-				if (raycastResult.selected) {
-					drawBlockGizmo(raycastResult.blockCoord);
-					if (mMouseClicked || rMouseClicked)
-					{
-						mMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Left] == 1;					
-						rMouseClicked = m_mouseState.m_buttons[entry::MouseButton::Right] == 1;
-					}
-					else
-					{
-						if (m_mouseState.m_buttons[entry::MouseButton::Left] == 1) 
-						{
-							mMouseClicked = true;
-							mCellSystem.setBlockType(BlockType::AIR, raycastResult.blockCoord);
-						}
-						if (m_mouseState.m_buttons[entry::MouseButton::Right] == 1) // place block
-						{
-							rMouseClicked = true;
-							mCellSystem.setBlockType(BlockType::DIRT, (raycastResult.blockCoord + raycastResult.face));
-						}
-					}
-				}
-
-
-				startRender();
-				//renderSkybox();
-
-				auto meshes = mPreRenderSystem.getMeshes(mCameraData);
-				auto chunkOffset = mCameraData.blockSize * mCameraData.chunkSize;
-				for (auto& mesh : meshes)
-				{
-					auto transform = glm::mat4(1.0f);
-					transform = glm::translate(transform, glm::vec3(0.5f));
-					mesh->submitMesh(0, m_program, transform, s_texColor, m_textureColor);
-				}
-
-
-				if (mDebugData.showChunkGizmos)
-				{
-					drawChunkGizmos();
-				}
-
+<<<<<<< HEAD
 				endRender();
 				return true;
 			}
@@ -412,6 +229,11 @@ namespace mc
 			mCameraData.ratio = (float)m_width / (float)m_height;
 			mCameraData.farDist = (mCameraData.viewDistance - 1) * mCameraData.chunkSize * mCameraData.blockSize;
 		}
+=======
+		void renderSkybox();
+		void updateCamera(float deltaTime);
+    private:
+>>>>>>> 43f0a9e3034747384b2a6a297a55a378bf825b25
 
 		entry::MouseState m_mouseState;
 		entry::MouseState r_mouseState;
@@ -448,8 +270,7 @@ namespace mc
 		float frustrumFarDistance;
 		bool mMouseClicked = false;
 		bool rMouseClicked = false;
-	};
-
+	}; 
 
 } // namespace
 
