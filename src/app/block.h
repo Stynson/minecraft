@@ -45,7 +45,8 @@ namespace mc
 		struct BlockDescriptor
 		{
 			BlockDescriptor() {}
-			BlockDescriptor(int x)
+			BlockDescriptor(int x, bool opaque = true)
+				:isOpaque(opaque)
 			{
 				std::fill(textureIndex.begin(), textureIndex.end(), x);
 			}
@@ -63,10 +64,15 @@ namespace mc
 				textureIndex = values;
 			}
 			std::array<int, 6> textureIndex;
+			bool isOpaque = true;
 		};
 		static int getBlockIndex(BlockType blockType, Side side)
 		{
 			return blockDescriptors[(int)blockType].textureIndex[(int)side];
+		}
+		static bool isOpaque(BlockType blockType)
+		{
+			return blockDescriptors[(int)blockType].isOpaque;
 		}
 	private:
 

@@ -291,7 +291,7 @@ namespace mc
 		void startRender()
 		{
 			ddBegin(0);
-			if (mDebugData.isFirstPerson)
+			if (!mDebugData.isFirstPerson)
 			{
 				glm::mat4 debugCameraView;
 				glm::vec3 zero(0.0f);
